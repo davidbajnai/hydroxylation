@@ -280,7 +280,7 @@ for _ in range(monte_carlo_iterations):
 
 theta_kinetic = np.round(np.mean(theta_kinetic_lst),3)
 theta_kinetic_err = np.round(np.std(theta_kinetic_lst),3)
-print(f"The kinetic OH-/OH- theta is: {theta_kinetic}(±{theta_kinetic_err})")
+print(f"\nThe kinetic OH-/OH- theta is: {theta_kinetic}(±{theta_kinetic_err})")
 
 
 fig, ax = plt.subplots()
@@ -324,8 +324,7 @@ ax.scatter(prime(d18O_OH_eq), Dp17O_OH_eq,
 ax.text(prime(d18O_OH_eq)-2, Dp17O_OH_eq,
         r"OH$_{eq}^{-}$",
         ha="right", va="center", color="#FFBB00")
-print(f"Equilibrium OH- d18O = {d18O_OH_eq:.2f}")
-print(f"The 18KIE_OH- is: {(d18O_OH - d18O_OH_eq):.2f}")
+print(f"\nThe difference in Dp17O between effective and equilibrium OH- is {Dp17O_OH-Dp17O_OH_eq:.0f} ppm")
 
 # Line between equilibrium OH- and water
 ax.text(0, -10,
@@ -337,7 +336,7 @@ ax.annotate("", xy=(prime(d18O_OH_eq), Dp17O_OH_eq), xycoords='data',
 
 # Line between effective OH- equilibrium OH-
 grahams_law = np.round((np.log((16+1)/(17+1)))/(np.log((16+1)/(18+1))),3)
-print(f"The KIE theta is: {theta_kinetic}. The expected value based on Graham's law is: {grahams_law}")
+print(f"\nThe KIE theta is: {theta_kinetic}. The expected value based on Graham's law is: {grahams_law}")
 ax.text((prime(d18O_OH) + prime(d18O_OH_eq))/2+10, (Dp17O_OH + Dp17O_OH_eq)/2,
         r"$\theta_{OH^-}^{KIE}$ = " + f"{theta_kinetic}  \n(±{theta_kinetic_err})",
         ha="right", va="top", color="#FF7A00",
@@ -367,7 +366,7 @@ ax.text(prime(d18O_precipitate), (Dp17O_precipitate+20), "witherite\nprecipitate
 # BaCO3 in equilibrium
 d18OBaCO3 = d18Ocal(22+273.15, d18O_water)
 d17OBaCO3 = d17Ocal(22+273.15, d17O(d18O_water, Dp17O_water))
-print(f"The difference between the precipitates and carbonate equilibrium is: {round(Dp17O_precipitate - Dp17O(d17OBaCO3, d18OBaCO3))}")
+
 ax.scatter(prime(d18OBaCO3), Dp17O(d17OBaCO3, d18OBaCO3),
            marker="o", c="w", ec = "k", label="equilibrium carbonate")
 ax.text(prime(d18OBaCO3), Dp17O(d17OBaCO3, d18OBaCO3)+10, "equilibrium\ncarbonate",
