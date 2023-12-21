@@ -1,4 +1,4 @@
-# Supplementary material for the paper "Triple oxygen isotope systematics of hydroxylation"
+# Supplementary material for:</br><b>"Triple oxygen isotope systematics of hydroxylation"</b>
 
 ## Reference
 
