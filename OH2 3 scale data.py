@@ -180,8 +180,8 @@ df_wAFF = applyAFF(df, "calcite")
 df_wAFF = df_wAFF[~df_wAFF["SampleName"].str.contains("NBS|DH11|IAEA")]
 df_wAFF.to_csv(sys.path[0] + "/OH2 Table S2.csv", index=False)
 
-df_wAFF = df_wAFF[~df_wAFF["SampleName"].str.contains("KoelnRefCO2-2")]
-df = df[~df["SampleName"].str.contains("NBS|DH11|IAEA|KoelnRefCO2-2")]
+df_wAFF = df_wAFF[~df_wAFF["SampleName"].str.contains("KoelnRefCO2-2")].reset_index(drop=True)
+df = df[~df["SampleName"].str.contains("NBS|DH11|IAEA|KoelnRefCO2-2")].reset_index(drop=True)
 
 
 # Create an additional supplementary figure
@@ -198,41 +198,47 @@ colors = dict(zip(categories, plt.cm.tab20(np.linspace(0, 1, len(categories)))))
 plt.rcParams["figure.figsize"] = (9, 4)
 
 # Subplot A: scaled sample replicates
-ax1 = plt.subplot(1, 2, 1)
+fig, (ax1, ax2) = plt.subplots(1, 2)
 
 for cat in categories:
     data = df[df["SampleName"] == cat]
     ax1.scatter(prime(data["d18O_scaled"]), data["Dp17O_scaled"],
                marker=markers[cat], color=colors[cat], label=cat, ec="k")
-    plt.errorbar(prime(df["d18O_scaled"]), df["Dp17O_scaled"],
+    ax1.errorbar(prime(df["d18O_scaled"]), df["Dp17O_scaled"],
                  yerr=df["Dp17OError"],
                  xerr=df["d18OError"],
                  fmt="none", color="#cacaca", zorder=0)
 
-plt.text(0.98, 0.98, "A", size=14, ha="right", va="top",
+ax1.text(0.98, 0.98, "A", size=14, ha="right", va="top",
          transform=ax1.transAxes, fontweight="bold")
-plt.ylabel("$\Delta^{\prime 17}$O (ppm, CO$_2$)")
-plt.xlabel("$\delta^{\prime 18}$O (‰, VSMOW, CO$_2$)")
 
-# Subplot B: scaled sample averages
-ax2 = plt.subplot(1, 2, 2, sharey=ax1, sharex=ax1)
+ax1.set_ylabel("$\Delta^{\prime 17}$O (ppm, CO$_2$)")
+ax1.set_xlabel("$\delta^{\prime 18}$O (‰, VSMOW, CO$_2$)")
+
+ylim = ax1.get_ylim()
+xlim = ax1.get_xlim()
+
+# Subplot B
 
 for cat in categories:
     data = df_wAFF[df_wAFF["SampleName"] == cat]
     ax2.scatter(prime(data["d18O_CO2"]), data["Dp17O_CO2"],
                 marker=markers[cat], color=colors[cat], label=cat, ec="k")
-    plt.errorbar(prime(df_wAFF["d18O_CO2"]), df_wAFF["Dp17O_CO2"],
+    ax2.errorbar(prime(df_wAFF["d18O_CO2"]), df_wAFF["Dp17O_CO2"],
                  yerr=df_wAFF["Dp17O_error"],
                  xerr=df_wAFF["d18O_error"],
                  fmt="none", color="#cacaca", zorder=0)
 
-plt.text(0.98, 0.98, "B", size=14, ha="right", va="top",
+ax2.text(0.98, 0.98, "B", size=14, ha="right", va="top",
          transform=ax2.transAxes, fontweight="bold")
 
-plt.ylabel("$\Delta^{\prime 17}$O (ppm, CO$_2$)")
-plt.xlabel("$\delta^{\prime 18}$O (‰, VSMOW, CO$_2$)")
+ax2.set_ylabel("$\Delta^{\prime 17}$O (ppm, CO$_2$)")
+ax2.set_xlabel("$\delta^{\prime 18}$O (‰, VSMOW, CO$_2$)")
 
-plt.legend(loc='upper right', bbox_to_anchor=(1.25, 1))
+ax2.set_ylim(ylim)
+ax2.set_xlim(xlim)
+
+ax2.legend(loc='upper right', bbox_to_anchor=(1.25, 1))
 
 plt.savefig(sys.path[0] + "/" + "OH2 Figure S3.png")
 plt.close("all")
