@@ -49,25 +49,25 @@ df = pd.read_csv(sys.path[0] + "/" + "OH2 Table S1.csv")
 df = df[df["MeasurementPeriod"].str.contains("2023-09-20 to 2023-10-08")]
 df = df[df["SampleName"].str.contains("light|heavy|NBS18|IAEA")]
 
-heavy_d18O_SD = round(df[df["SampleName"].str.contains("heavy")]["d18O"].std(),3)
-heavy_Dp17O_SD = round(df[df["SampleName"].str.contains("heavy")]["Dp17O"].std())
+heavy_d18O_SD = df[df["SampleName"].str.contains("heavy")]["d18O"].std()
+heavy_Dp17O_SD = df[df["SampleName"].str.contains("heavy")]["Dp17O"].std()
 N_heavy = len(df[df["SampleName"].str.contains("heavy")])
-print(f"Heavy reference gas, N = {N_heavy}, d18O SD = ±{heavy_d18O_SD}‰, ∆'17O = ±{heavy_Dp17O_SD} ppm")
+print(f"\nHeavy reference gas, N = {N_heavy}, d18O SD = ±{heavy_d18O_SD:.3f}‰, ∆'17O = ±{heavy_Dp17O_SD:.0f} ppm")
 
-light_d18O_SD = round(df[df["SampleName"].str.contains("light")]["d18O"].std(),3)
-light_Dp17O_SD = round(df[df["SampleName"].str.contains("light")]["Dp17O"].std())
+light_d18O_SD = df[df["SampleName"].str.contains("light")]["d18O"].std()
+light_Dp17O_SD = df[df["SampleName"].str.contains("light")]["Dp17O"].std()
 N_light = len(df[df["SampleName"].str.contains("light")])
-print(f"Light reference gas, N = {N_light}, d18O: ±{light_d18O_SD}‰, ∆'17O: ±{light_Dp17O_SD} ppm")
+print(f"Light reference gas, N = {N_light}, d18O: ±{light_d18O_SD:.3f}‰, ∆'17O: ±{light_Dp17O_SD:.0f} ppm")
 
-IAEA603_d18O_SD = round(df[df["SampleName"].str.contains("IAEA603")]["d18O"].std(),3)
-IAEA603_Dp17O_SD = round(df[df["SampleName"].str.contains("IAEA603")]["Dp17O"].std())
+IAEA603_d18O_SD = df[df["SampleName"].str.contains("IAEA603")]["d18O"].std()
+IAEA603_Dp17O_SD = df[df["SampleName"].str.contains("IAEA603")]["Dp17O"].std()
 N_IAEA603 = len(df[df["SampleName"].str.contains("IAEA603")])
-print(f"IAEA-603, N = {N_IAEA603}, d18O: ±{IAEA603_d18O_SD}‰, ∆'17O: ±{IAEA603_Dp17O_SD} ppm")
+print(f"IAEA-603, N = {N_IAEA603}, d18O: ±{IAEA603_d18O_SD:.3f}‰, ∆'17O: ±{IAEA603_Dp17O_SD:.0f} ppm")
 
-NBS18_d18O_SD = round(df[df["SampleName"].str.contains("NBS18")]["d18O"].std(),3)
-NBS18_Dp17O_SD = round(df[df["SampleName"].str.contains("NBS18")]["Dp17O"].std())
+NBS18_d18O_SD = df[df["SampleName"].str.contains("NBS18")]["d18O"].std()
+NBS18_Dp17O_SD = df[df["SampleName"].str.contains("NBS18")]["Dp17O"].std()
 N_NBS18 = len(df[df["SampleName"].str.contains("NBS18")])
-print(f"NBS-18, N = {N_NBS18}, d18O: ±{NBS18_d18O_SD}‰, ∆'17O: ±{NBS18_Dp17O_SD} ppm")
+print(f"NBS-18, N = {N_NBS18}, d18O: ±{NBS18_d18O_SD:.3f}‰, ∆'17O: ±{NBS18_Dp17O_SD:.0f} ppm")
 
 # Do the scaling here
 IAEA603_d18O_measured = df[df["SampleName"].str.contains("IAEA603")]["d18O"].mean()
@@ -80,12 +80,12 @@ NBS18_d17O_measured = df[df["SampleName"].str.contains("NBS18")]["d17O"].mean()
 IAEA603_d18O_accepted = (to_VSMOW(-2.37) + 1000) * 1.01025 - 1000
 IAEA603_Dp17O_accepted = -147 # from Wostbrock et al. (2020)
 IAEA603_d17O_accepted = unprime(IAEA603_Dp17O_accepted/1000 + 0.528 * prime(IAEA603_d18O_accepted))
-print(f"Accepted for IAEA603 d18O = {round(IAEA603_d18O_accepted,3)}‰, ∆'17O = {round(IAEA603_Dp17O_accepted)} ppm")
+print(f"\nAccepted for IAEA603 d18O = {IAEA603_d18O_accepted:.3f}‰, ∆'17O = {IAEA603_Dp17O_accepted:.0f} ppm")
 
 NBS18_d18O_accepted = (to_VSMOW(-23.2) + 1000) * 1.01025 - 1000
 NBS18_Dp17O_accepted = -100 # from Wostbrock et al. (2020)
 NBS18_d17O_accepted = unprime(NBS18_Dp17O_accepted/1000 + 0.528 * prime(NBS18_d18O_accepted))
-print(f"Accepted for NBS18 d18O = {round(NBS18_d18O_accepted,3)}‰, ∆'17O = {round(NBS18_Dp17O_accepted)} ppm")
+print(f"Accepted for NBS18 d18O = {NBS18_d18O_accepted:.3f}‰, ∆'17O = {NBS18_Dp17O_accepted:.0f} ppm")
 
 slope_d18O = (NBS18_d18O_accepted - IAEA603_d18O_accepted) / (NBS18_d18O_measured - IAEA603_d18O_measured)
 intercept_d18O = IAEA603_d18O_accepted - slope_d18O * IAEA603_d18O_measured

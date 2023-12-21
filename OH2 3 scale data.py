@@ -26,13 +26,11 @@ plt.rcParams["savefig.bbox"] = "tight"
 
 # Define functions
 def prime(delta):
-    dprime = 1000 * np.log(delta/1000 + 1)
-    return dprime
+    return 1000 * np.log(delta/1000 + 1)
 
 
 def unprime(dprime):
-    delta = (np.exp(dprime/1000) - 1) * 1000
-    return delta
+    return (np.exp(dprime/1000) - 1) * 1000
 
 
 # This function calculates the ∆'17O value (in ppm) from the d17O and d18O values
@@ -58,15 +56,15 @@ def scaleData(df, project):
 
         print(f"Measurement period {period}:")
 
-        heavy_d18O_SD = round(group[group["SampleName"].str.contains("heavy")]["d18O"].std(), 3)
-        heavy_Dp17O_SD = round(group[group["SampleName"].str.contains("heavy")]["Dp17O"].std())
+        heavy_d18O_SD = group[group["SampleName"].str.contains("heavy")]["d18O"].std()
+        heavy_Dp17O_SD = group[group["SampleName"].str.contains("heavy")]["Dp17O"].std()
         N_heavy = len(group[group["SampleName"].str.contains("heavy")])
-        print(f"Heavy reference gas N = {N_heavy}, d18O SD = ±{heavy_d18O_SD}‰, ∆'17O SD = ±{heavy_Dp17O_SD} ppm")
+        print(f"Heavy reference gas N = {N_heavy}, d18O SD = ±{heavy_d18O_SD:.3f}‰, ∆'17O SD = ±{heavy_Dp17O_SD:.0f} ppm")
 
-        light_d18O_SD = round(group[group["SampleName"].str.contains("light")]["d18O"].std(), 3)
-        light_Dp17O_SD = round(group[group["SampleName"].str.contains("light")]["Dp17O"].std())
+        light_d18O_SD = group[group["SampleName"].str.contains("light")]["d18O"].std()
+        light_Dp17O_SD = group[group["SampleName"].str.contains("light")]["Dp17O"].std()
         N_light = len(group[group["SampleName"].str.contains("light")])
-        print(f"Light reference gas N = {N_light}, d18O SD: ±{light_d18O_SD}‰, ∆'17O SD: ±{light_Dp17O_SD} ppm")
+        print(f"Light reference gas N = {N_light}, d18O SD: ±{light_d18O_SD:.3f}‰, ∆'17O SD: ±{light_Dp17O_SD:.0f} ppm")
 
         # Do the scaling here, based on the accepted values of the light and heavy reference gases
         heavy_d18O_measured = group[group["SampleName"].str.contains("heavy")]["d18O"].mean()
@@ -157,19 +155,15 @@ def applyAFF(df, mineral):
     if mineral == "calcite":
         dfMerged["d18O_AC"] = (dfMerged["d18O_CO2"] + 1000) / 1.01025 - 1000
         dfMerged["d17O_AC"] = (dfMerged["d17O_CO2"] + 1000) / (1.01025 ** 0.523) - 1000
-        dfMerged["Dp17O_AC"] = round(
-            Dp17O(dfMerged["d17O_AC"], dfMerged["d18O_AC"]), 0).astype(int)
+        dfMerged["Dp17O_AC"] = Dp17O(dfMerged["d17O_AC"], dfMerged["d18O_AC"])
+
     elif mineral == "aragonite":
         dfMerged["d18O_AC"] = (dfMerged["d18O_CO2"] + 1000) / 1.01063 - 1000
         dfMerged["d17O_AC"] = (dfMerged["d17O_CO2"] + 1000) / (1.01063 ** 0.523) - 1000
-        dfMerged["Dp17O_AC"] = round(
-            Dp17O(dfMerged["d17O_AC"], dfMerged["d18O_AC"]), 0).astype(int)
-    
-    df = round(df, 3)
-    df["Dp17O_error"] = round(df["Dp17O_error"], 0).astype(int)
+        dfMerged["Dp17O_AC"] = Dp17O(dfMerged["d17O_AC"], dfMerged["d18O_AC"])
 
     print("All sample replicates averaged:")
-    print(df)
+    print(df.round({"Dp17O_CO2": 0, "Dp17O_error": 0, "Dp17O_AC": 0}).round(3))
 
     return df
 
@@ -183,18 +177,11 @@ df = scaleData(pd.read_csv(sys.path[0] + "/OH2 Table S1.csv"), "OH2")
 df_wAFF = applyAFF(df, "calcite")
 
 # Exclude carbonate references
-df_wAFF = df_wAFF[~df_wAFF["SampleName"].str.contains("NBS")]
-df_wAFF = df_wAFF[~df_wAFF["SampleName"].str.contains("DH11")]
-df_wAFF = df_wAFF[~df_wAFF["SampleName"].str.contains("IAEA")]
-
+df_wAFF = df_wAFF[~df_wAFF["SampleName"].str.contains("NBS|DH11|IAEA")]
 df_wAFF.to_csv(sys.path[0] + "/OH2 Table S2.csv", index=False)
 
 df_wAFF = df_wAFF[~df_wAFF["SampleName"].str.contains("KoelnRefCO2-2")]
-
-df = df[~df["SampleName"].str.contains("NBS")]
-df = df[~df["SampleName"].str.contains("DH11")]
-df = df[~df["SampleName"].str.contains("IAEA")]
-df = df[~df["SampleName"].str.contains("KoelnRefCO2-2")]
+df = df[~df["SampleName"].str.contains("NBS|DH11|IAEA|KoelnRefCO2-2")]
 
 
 # Create an additional supplementary figure
