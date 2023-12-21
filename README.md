@@ -1,4 +1,7 @@
-# Supplementary material for:</br><b>"Triple oxygen isotope systematics of hydroxylation"</b>
+# Supplementary material for:</br>"Triple oxygen isotope systematics of hydroxylation"
+
+## Abstract
+![Graphical Abstract](OH2 Graphical Abstract.png)
 
 ## Reference
 

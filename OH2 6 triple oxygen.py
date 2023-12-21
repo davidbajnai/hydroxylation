@@ -385,66 +385,87 @@ ax.set_xlabel("$\delta^{\prime 18}$O (‰, VSMOW)")
 plt.savefig(sys.path[0] + "/OH2 Figure 4.png")
 plt.close("all")
 
-# # Create abstract graphics
-# plt.rcParams["figure.figsize"] = (3.25, 1.75)
-# fig, ax = plt.subplots()
 
-# # water
-# ax.scatter(prime(d18O_water), Dp17O_water,
-#            marker="D", fc="#1455C0", ec="black", label="H$_2$O")
-# ax.text(prime(d18O_water), Dp17O_water-15, "H$_2$O",
-#         ha="center", va="top", color="#1455C0")
+# Create abstract graphics
+plt.rcParams["figure.figsize"] = (13/2, 5/2)
+plt.rcParams.update({'font.size': 14})
+plt.rcParams["lines.linewidth"] = 1  # error bar width
+plt.rcParams["patch.linewidth"] = 1  # marker edge width
 
-# # KIE OH-
-# ax.scatter(prime(d18O_OH), Dp17O_OH,
-#            marker="s", fc="#EC0016", ec="k", label="OH$^-$")
-# ax.text(prime(d18O_OH)+2, Dp17O_OH,
-#         r"OH$_{KIE}^{-}$",
-#         ha="left", va="center", color="#EC0016")
+fig, ax = plt.subplots()
 
-# # Line between effective OH- and water
-# ax.plot([prime(d18O_OH), prime(d18O_water)], [Dp17O_OH, Dp17O_water],
-#         color="#814997", lw=1.5, zorder=-1, ls="-")
-# ax.text((prime(d18O_OH) + prime(d18O_water))/2+15, (Dp17O_OH + Dp17O_water)/2,
-#         r"$\theta_{H_2O/OH^-}^{effective}$ = " + f"{theta_effective}  \n(±{theta_effective_err})",
-#         ha="right", va="center", color="#814997")
+fig.patch.set_facecolor('#1455C0')
+ax.set_facecolor('#1455C0')
 
-# # OH- equilibrium
-# ax.scatter(prime(d18O_OH_eq), Dp17O_OH_eq,
-#            marker="s", fc="#FFBB00", ec="k", label=r"OH$_{eq}^{-}$")
-# ax.text(prime(d18O_OH_eq), Dp17O_OH_eq-15,
-#         r"OH$_{eq}^{-}$",
-#         ha="center", va="top", color="#FFBB00")
+# change axis colors to white
+ax.spines['bottom'].set_color('w')
+ax.spines['top'].set_color('w')
+ax.spines['left'].set_color('w')
+ax.spines['right'].set_color('w')
+ax.xaxis.label.set_color('w')
+ax.yaxis.label.set_color('w')
+ax.tick_params(axis='x', colors='w')
+ax.tick_params(axis='y', colors='w')
 
-# # Line between equilibrium OH- and water
-# ax.plot([prime(d18O_OH_eq), prime(d18O_water)], [Dp17O_OH_eq, Dp17O_water],
-#         color="#63A615", lw=1.5, zorder=-1, ls="-")
-# ax.text(-15, 0,
-#         r"$\theta_{H_2O/OH^-}^{equilibrium}$ $\approx$" + f"{theta_eq_H2O_OH}  \n(±{theta_eq_H2O_OH_err})",
-#         ha="right", va="center", color="#63A615",
-#         bbox=dict(fc='white', ec="None", alpha=0.8, pad=0.2))
+# water
+ax.scatter(prime(d18O_water), Dp17O_water,
+           fc="w", ec="#1455C0", marker="o", s=50, zorder=3)
+ax.text(prime(d18O_water), Dp17O_water-15,
+        "H$_2$O",
+        ha="center", va="top", color="w")
 
-# # Line between effective OH- equilibrium OH-
-# ax.plot([prime(d18O_OH), prime(d18O_OH_eq)], [Dp17O_OH, Dp17O_OH_eq],
-#         color="#FF7A00", lw=1.5, zorder=-1, ls="-")
-# grahams_law = np.round((np.log((16+1)/(17+1)))/(np.log((16+1)/(18+1))),3)
-# ax.text((prime(d18O_OH) + prime(d18O_OH_eq))/2+10, (Dp17O_OH + Dp17O_OH_eq)/2,
-#         r"$\theta_{OH^-}^{KIE}$ $\approx$ " + f"{theta_kinetic}  \n(±{theta_kinetic_err})",
-#         ha="right", va="top", color="#FF7A00",
-#         bbox=dict(fc='white', ec="None", alpha=0.8, pad=0.2))
+# KIE OH-
+ax.scatter(prime(d18O_OH), Dp17O_OH,
+           fc="w", ec="#1455C0", marker="o", s=50, zorder=3)
+ax.text(prime(d18O_OH), Dp17O_OH+15,
+        r"OH$_{KIE}^{-}$",
+        ha="center", va="bottom", color="w")
 
-# # plot background yellow
-# fig.patch.set_facecolor('#FFFFAF')
+# Line between effective OH- and water
+ax.text((prime(d18O_OH) + prime(d18O_water))/2+13, (Dp17O_OH + Dp17O_water)/2+20,
+        r"$\theta_{H_2O/OH^-}^{effective}$ = " + f"{theta_effective}",
+        ha="right", va="center", color="w",
+        fontsize=12)
+ax.annotate("", xy=(prime(d18O_OH), Dp17O_OH), xycoords='data',
+            xytext=(prime(d18O_water), Dp17O_water), textcoords='data',
+            arrowprops=dict(arrowstyle="<|-|>", color="w", lw=1.5), zorder = -1)
 
-# # Axis parameters
-# ax.set_ylabel("$\Delta^{\prime 17}$O")
-# ax.set_xlabel("$\delta^{\prime 18}$O")
-# ax.set_ylim(-50, 250)
-# ax.set_xticklabels([])
-# ax.set_yticklabels([])
-# ax.xaxis.set_ticks_position('none')
-# ax.yaxis.set_ticks_position('none')
+# OH- equilibrium
+ax.scatter(prime(d18O_OH_eq), Dp17O_OH_eq,
+           fc="w", ec="#1455C0", marker="o", s=50, zorder=3)
+ax.text(prime(d18O_OH_eq), Dp17O_OH_eq-15,
+        r"OH$_{eq.}^{-}$",
+        ha="center", va="top", color="w")
 
-# # Save figure
-# plt.tight_layout(pad=0.4, w_pad=0.4, h_pad=0.4)
-# plt.savefig(sys.path[0] + "/OH2 Abstract Graphics.png")
+# Line between equilibrium OH- and water
+ax.text((prime(d18O_OH_eq) + prime(d18O_water))/2, (Dp17O_OH_eq + Dp17O_water)/2-20,
+        r"$\theta_{H_2O/OH^-}^{equilibrium}$ = " + f"{theta_eq_H2O_OH}",
+        ha="center", va="top", color="w",
+        fontsize=12)
+ax.annotate("", xy=(prime(d18O_OH_eq), Dp17O_OH_eq), xycoords='data',
+            xytext=(prime(d18O_water), Dp17O_water), textcoords='data',
+            arrowprops=dict(arrowstyle="<|-|>", color="w", lw=1.5), zorder = -1)
+
+# Line between effective OH- equilibrium OH-
+grahams_law = np.round((np.log((16+1)/(17+1)))/(np.log((16+1)/(18+1))),3)
+ax.text((prime(d18O_OH) + prime(d18O_OH_eq))/2, (Dp17O_OH + Dp17O_OH_eq)/2-30,
+        r"$\theta_{OH^-}^{KIE}$ = " + f"{theta_kinetic}",
+        ha="right", va="center", color="w",
+        fontsize=12)
+ax.annotate("", xy=(prime(d18O_OH), Dp17O_OH), xycoords='data',
+            xytext=(prime(d18O_OH_eq), Dp17O_OH_eq), textcoords='data',
+            arrowprops=dict(arrowstyle="-|>", color="w", lw=1.5), zorder = -1)
+
+# Axis parameters
+ax.set_ylabel("$\Delta^{\prime 17}$O")
+ax.set_xlabel("$\delta^{\prime 18}$O")
+ax.set_ylim(-90, 290)
+ax.set_xlim(-51, -6)
+ax.set_xticklabels([])
+ax.set_yticklabels([])
+ax.xaxis.set_ticks_position('none')
+ax.yaxis.set_ticks_position('none')
+
+# Save figure
+plt.savefig(sys.path[0] + "/OH2 Graphical Abstract.png")
+plt.close("all")
