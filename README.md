@@ -1,14 +1,12 @@
 # Supplementary material for:</br>Triple oxygen isotope systematics of hydroxylation
 
-## Abstract
+## Graphical abstract
 ![Graphical Abstract](./OH2%20Graphical%20Abstract.png)
 
 ## Reference
-
 The paper is currently under review.
 
 ## License
-
 Copyright (C) 2023 <a href="https://davidbajnai.eu">David Bajnai</a>
 
 This program is free software: you can redistribute it and/or modify
