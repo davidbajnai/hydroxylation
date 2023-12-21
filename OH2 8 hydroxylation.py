@@ -163,13 +163,13 @@ d17O_CO2 = d17O(d18O_CO2, Dp17O_CO2)
 
 # CO2 KIE
 CO2_KIE_shift = -3
-CO2_KIE_theta = 0.506
+CO2_KIE_theta = (np.log((12+16+16)/(12+17+16)))/(np.log((12+16+16)/(12+18+16)))
 d18O_CO2_KIE = d18O_CO2 + CO2_KIE_shift
 Dp17O_CO2_KIE = apply_theta(d18O_CO2, Dp17O_CO2, shift_d18O = CO2_KIE_shift, theta = CO2_KIE_theta)
 
 # Line between CO2 and CO2 KIE
 ax1.text((prime(d18O_CO2) + prime(d18O_CO2_KIE))/2 + 5, (Dp17O_CO2 + Dp17O_CO2_KIE)/2,
-        r"$\theta_{CO_2}^{KIE}$ = " + f"{CO2_KIE_theta}",
+        r"$\theta_{CO_2}^{KIE}$ = " + f"{CO2_KIE_theta:.3f}",
         ha="left", va="center", color="#008984",
         bbox=dict(fc='white', ec="None", alpha=0.8, pad=0.1))
 ax1.annotate("", xy=(prime(d18O_CO2), Dp17O_CO2), xycoords='data',
@@ -285,7 +285,7 @@ Dp17O_CO2_KIE = apply_theta(d18O_CO2, Dp17O_CO2, shift_d18O = CO2_KIE_shift, the
 
 # Line between CO2 and CO2 KIE
 ax2.text((prime(d18O_CO2) + prime(d18O_CO2_KIE))/2 + 5, (Dp17O_CO2 + Dp17O_CO2_KIE)/2,
-        r"$\theta_{CO_2}^{KIE}$ = " + f"{CO2_KIE_theta}",
+        r"$\theta_{CO_2}^{KIE}$ = " + f"{CO2_KIE_theta:.3f}",
         ha="left", va="center", color="#008984",
         bbox=dict(fc='white', ec="None", alpha=0.8, pad=0.1))
 ax2.annotate("", xy=(prime(d18O_CO2), Dp17O_CO2), xycoords='data',
