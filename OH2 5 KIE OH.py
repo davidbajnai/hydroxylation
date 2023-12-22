@@ -151,6 +151,7 @@ df["1000lna18"] = elena(d18O_water, df["d18O_OH_effective"])
 ax.scatter(np.full(len(df), 22), df["1000lna18"],
            marker="o", color="#38342F", ec="k",
            label="experimental data from\nthis study (" + r"$\it{n}$" + f" = {len(df)})")
+print(f"\nThe mean value of 1000lna18OH- is {df['1000lna18'].mean():.1f}‰ (1σ = {df['1000lna18'].std():.1f}‰)")
 
 # Show BH21 equation without the acid fractionation correction
 ax.text(0, 14,
@@ -165,9 +166,9 @@ OH_eff = df["d18O_OH_effective"].mean()
 KIE_OH = (np.log((OH_eff+1000) / (OH_eq+1000))*1000)
 
 print(f"\nKIE_OH = {KIE_OH:.1f}‰ (relative to the theoretical equilibrium value from Z20-X3LYP")
-
-ax.annotate("", xy=(temp, OH_eq), xytext=(temp, OH_eff),
+ax.annotate("", xy=(temp, np.log(a18OH(temp+273.15, "Z20-X3LYP"))*1000), xytext=(temp, df["1000lna18"].mean()),
             arrowprops=dict(arrowstyle="<|-", color="#FF7A00", lw=1.5))
+
 ax.text(23, 30, r"$^{18}KIE_{OH^{-}}$", 
         ha="left", va="center", color="#FF7A00")
 

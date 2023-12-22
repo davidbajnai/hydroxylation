@@ -417,11 +417,11 @@ ax.text(prime(d18O_water), Dp17O_water-15,
 ax.scatter(prime(d18O_OH), Dp17O_OH,
            fc="w", ec="#1455C0", marker="o", s=50, zorder=3)
 ax.text(prime(d18O_OH), Dp17O_OH+15,
-        r"OH$_{KIE}^{-}$",
+        r"OH$^{-}$ + KIE",
         ha="center", va="bottom", color="w")
 
 # Line between effective OH- and water
-ax.text((prime(d18O_OH) + prime(d18O_water))/2+13, (Dp17O_OH + Dp17O_water)/2+20,
+ax.text((prime(d18O_OH) + prime(d18O_water))/2+13, (Dp17O_OH + Dp17O_water)/2+25,
         r"$\theta_{H_2O/OH^-}^{effective}$ = " + f"{theta_effective}",
         ha="right", va="center", color="w",
         fontsize=12)
@@ -433,7 +433,7 @@ ax.annotate("", xy=(prime(d18O_OH), Dp17O_OH), xycoords='data',
 ax.scatter(prime(d18O_OH_eq), Dp17O_OH_eq,
            fc="w", ec="#1455C0", marker="o", s=50, zorder=3)
 ax.text(prime(d18O_OH_eq), Dp17O_OH_eq-15,
-        r"OH$_{eq.}^{-}$",
+        r"OH$^{-}$",
         ha="center", va="top", color="w")
 
 # Line between equilibrium OH- and water
@@ -459,7 +459,7 @@ ax.annotate("", xy=(prime(d18O_OH), Dp17O_OH), xycoords='data',
 ax.set_ylabel("$\Delta^{\prime 17}$O")
 ax.set_xlabel("$\delta^{\prime 18}$O")
 ax.set_ylim(-90, 290)
-ax.set_xlim(-51, -6)
+ax.set_xlim(-53, -5)
 ax.set_xticklabels([])
 ax.set_yticklabels([])
 ax.xaxis.set_ticks_position('none')
