@@ -1,4 +1,4 @@
-# This code is used to calculate KIE for CO2
+# The following code is used to calculate KIE for CO2
 # based on the *revised* Table 7 in Christensen et al. (2021)
 
 # >>>>>>>>>
@@ -7,8 +7,8 @@
 import pandas as pd
 import numpy as np
 
-# Functions that make life easier
 
+# Functions that make life easier
 
 def a18OH(T=273.15+22, eq="Z20-X3LYP"):
     if (eq == "Z20-X3LYP"):
@@ -30,7 +30,7 @@ def B_from_a(a, A):
     return (A + 1000) / a - 1000
 
 
-# Table 7 in Christensen et al. (2021)
+# The *revised* Table 7 in Christensen et al. (2021)
 df = pd.DataFrame({
     "T": [22, 22, 5, 4, 21, 28, 28, 28, 27, 17],
     "d18O_CO2": [36.6, 11.1, 35.7, 41.5, 41.5, 41.7, 41.7, 41.7, 41.7, 41.5],

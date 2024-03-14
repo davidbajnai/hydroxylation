@@ -1,6 +1,6 @@
 # This code is used to calculate the 18KIE for OH-
 
-# INPUT: OH2 Table S1.csv, OH2 BH21 york error.csv
+# INPUT: OH2 Table S3.csv, OH2 BH21 york error.csv
 # OUTPUT: OH2 Figure 3.png
 
 # >>>>>>>>>
@@ -12,15 +12,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Plot parameters
-plt.rcParams["legend.loc"] = "best"
 plt.rcParams.update({'font.size': 7})
-plt.rcParams['scatter.edgecolors'] = "w"
+plt.rcParams['scatter.edgecolors'] = "k"
 plt.rcParams['scatter.marker'] = "o"
 plt.rcParams['lines.markersize'] = 5
 plt.rcParams["lines.linewidth"] = 0.5
 plt.rcParams["patch.linewidth"] = 0.5
 plt.rcParams["figure.figsize"] = (4, 4)
-plt.rcParams["savefig.dpi"] = 600
+plt.rcParams["savefig.dpi"] = 800
 plt.rcParams["savefig.bbox"] = "tight"
 
 # Functions that make life easier
@@ -80,6 +79,8 @@ def a18OH(T=273.15+22, eq="Z20-X3LYP"):
         e18_H2O_OH = -0.034 * (T-273.15) + 43.4
     elif (eq == "BH21"):
         e18_H2O_OH = -0.035 * (T-273.15) + 40.1
+    elif (eq == "GZ19"):
+        e18_H2O_OH = ((0.04264*(1000/T)+0.89702)-1)*1000
 
     return e18_H2O_OH / 1000 + 1
 
@@ -97,8 +98,7 @@ def A_from_a(a, B):
 
 
 def epsilon(d18O_A, d18O_B):
-    epsilon = ((d18O_A + 1000) / (d18O_B + 1000) - 1) * 1000
-    return epsilon
+    return ((d18O_A + 1000) / (d18O_B + 1000) - 1) * 1000
 
 
 def elena(d18O_A, d18O_B):
@@ -107,7 +107,7 @@ def elena(d18O_A, d18O_B):
 
 
 # Read in data
-df = pd.read_csv(sys.path[0] + "/OH2 Table S2.csv", sep=",")
+df = pd.read_csv(sys.path[0] + "/OH2 Table S3.csv", sep=",")
 df_BH21_york_err = pd.read_csv(sys.path[0] + "/OH2 BH21 york error.csv", sep=",")
 
 # Isotope composition of CO2 gas
@@ -133,6 +133,7 @@ temps = np.linspace(1, 80, 80)
 model_Z20_X3LYP = 1000*np.log(a18OH(temps+273.15, "Z20-X3LYP"))
 model_Z20_MP2 = 1000*np.log(a18OH(temps+273.15, "Z20-MP2"))
 model_BH21 = 1000*np.log(a18OH(temps+273.15, "BH21"))
+model_GZ19 = 1000*np.log(a18OH(temps+273.15, "GZ19"))
 
 ax.plot(temps, model_Z20_X3LYP,
         c="k", ls=":", lw=1,
@@ -140,8 +141,12 @@ ax.plot(temps, model_Z20_X3LYP,
 ax.plot(temps, model_Z20_MP2,
         c="k", ls="--", lw=1,
         label="Z20-MP2 (theoretical)")
+ax.plot(temps, model_GZ19,
+        c="k", ls="-.", lw=1,
+        label="GZ19 (theoretical)")
 
-ax.fill_between(df_BH21_york_err["x"], df_BH21_york_err["y_low"], df_BH21_york_err["y_up"], color='k', alpha=0.3, zorder=-10, edgecolor='none')
+ax.fill_between(df_BH21_york_err["x"], df_BH21_york_err["y_low"], df_BH21_york_err["y_up"],
+                color='k', alpha=0.3, zorder=-10, ec='none')
 ax.plot(temps, model_BH21,
         c="k", ls="-", lw=1,
         label=r"BH21$^\ddag$ (experimental)")
@@ -149,7 +154,7 @@ ax.plot(temps, model_BH21,
 df["d18O_OH_effective"] = (df["d18O_AC"] - 2/3 * d18O_CO2) * 3
 df["1000lna18"] = elena(d18O_water, df["d18O_OH_effective"])
 ax.scatter(np.full(len(df), 22), df["1000lna18"],
-           marker="o", color="#38342F", ec="k",
+           marker="o", color="#38342F", ec="k", zorder = 2,
            label="experimental data from\nthis study (" + r"$\it{n}$" + f" = {len(df)})")
 print(f"\nThe mean value of 1000lna18OH- is {df['1000lna18'].mean():.1f}‰ (1σ = {df['1000lna18'].std():.1f}‰)")
 
@@ -167,17 +172,17 @@ KIE_OH = (np.log((OH_eff+1000) / (OH_eq+1000))*1000)
 
 print(f"\nKIE_OH = {KIE_OH:.1f}‰ (relative to the theoretical equilibrium value from Z20-X3LYP")
 ax.annotate("", xy=(temp, np.log(a18OH(temp+273.15, "Z20-X3LYP"))*1000), xytext=(temp, df["1000lna18"].mean()),
-            arrowprops=dict(arrowstyle="<|-", color="#FF7A00", lw=1.5))
+            arrowprops=dict(arrowstyle="<|-", color="#EC0016", lw=1.5))
 
 ax.text(23, 30, r"$^{18}KIE_{OH^{-}}$", 
-        ha="left", va="center", color="#FF7A00")
+        ha="left", va="center", color="#EC0016")
 
-ax.set_ylim(12, 48)
+ax.set_ylim(12, 52)
 
-ax.legend()
+ax.legend(loc = "upper right")
 
 ax.set_ylabel(r"10$^3$ ln $\alpha_{H_2O/OH^-}^{18}$")
 ax.set_xlabel("Temperature (°C)")
 
 plt.savefig(sys.path[0] + "/OH2 Figure 3.png")
-plt.close()
+plt.close("all")

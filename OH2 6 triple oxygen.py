@@ -1,7 +1,7 @@
 # This code creates Figures 3 and 4 of the manuscript
 
-# INPUT: OH2 Table S1.csv
-# OUTPUT: OH2 Figure 3.png, OH2 Figure 4.png
+# INPUT: OH2 Table S3.csv
+# OUTPUT: OH2 Figure 4.png
 
 # >>>>>>>>>
 
@@ -12,19 +12,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Plot parameters
-plt.rcParams["legend.loc"] = "best"
 plt.rcParams.update({'font.size': 7})
-plt.rcParams['scatter.edgecolors'] = "w"
+plt.rcParams['scatter.edgecolors'] = "k"
 plt.rcParams['scatter.marker'] = "o"
 plt.rcParams['lines.markersize'] = 5
 plt.rcParams["lines.linewidth"] = 0.5
 plt.rcParams["patch.linewidth"] = 0.5
 plt.rcParams["figure.figsize"] = (4, 4)
-plt.rcParams["savefig.dpi"] = 600
+plt.rcParams["savefig.dpi"] = 800
 plt.rcParams["savefig.bbox"] = "tight"
 
-# Functions that make life easier
 
+# Functions that make life easier
 
 def prime(x):
     return 1000 * np.log(x / 1000 + 1)
@@ -36,6 +35,7 @@ def apply_prime_to_list(lst):
         result = prime(item)
         new_lst.append(result)
     return new_lst
+
 
 def unprime(x):
     return (np.exp(x / 1000) - 1) * 1000
@@ -193,7 +193,7 @@ def calculate_OH(d18O_CO2, Dp17O_CO2, d18O_precipitate, Dp17O_precipitate):
 monte_carlo_iterations = 10**3
 
 # Read in TILDAS data
-df = pd.read_csv(sys.path[0] + "/OH2 Table S2.csv", sep=",")
+df = pd.read_csv(sys.path[0] + "/OH2 Table S3.csv", sep=",")
 
 # Isotope composition of CO2 gas
 d18O_CO2 = df.loc[df['SampleName'] == 'KoelnRefCO2-2', 'd18O_CO2'].iloc[0]
@@ -295,70 +295,70 @@ fig, ax = plt.subplots()
 
 # water
 ax.scatter(prime(d18O_water), Dp17O_water,
-           marker="*", fc="#1455C0", ec="k", s = 50, label="H$_2$O")
+           marker="*", fc="k", ec="k", s = 50, label="H$_2$O")
 ax.errorbar(prime(d18O_water), Dp17O_water, xerr=d18O_water_err, yerr=Dp17O_water_err,
-            fmt="None", ecolor="#1455C0", zorder=-1)
+            fmt="None", ecolor="k", zorder=-1)
 ax.text(prime(d18O_water)+2, Dp17O_water, "H$_2$O",
-        ha="left", va="center", color="#1455C0")
+        ha="left", va="center", color="k")
 
 # KIE OH-
 ax.scatter(prime(d18O_OH), Dp17O_OH,
-           marker="s", fc="#EC0016", ec="k", label="OH$^-$")
+           marker="s", fc="k", ec="k", label="OH$^-$")
 ax.errorbar(prime(d18O_OH), Dp17O_OH, xerr=d18O_OH_err, yerr=Dp17O_OH_err,
-            fmt="None", ecolor="#EC0016", zorder=-1)
+            fmt="None", ecolor="k", zorder=-1)
 ax.text(prime(d18O_OH)+2, Dp17O_OH,
         r"OH$^{-}$ $\plus$ KIE",
-        ha="left", va="center", color="#EC0016")
+        ha="left", va="center", color="k")
 
 # Line between effective OH- and water
 ax.text((prime(d18O_OH) + prime(d18O_water))/2+25, (Dp17O_OH + Dp17O_water)/2,
         r"$\theta_{H_2O/OH^-}^{effective}$ = " + f"{theta_effective}  \n(±{theta_effective_err})",
-        ha="right", va="center", color="#814997")
+        ha="right", va="center", color="#EC0016")
 ax.annotate("", xy=(prime(d18O_OH), Dp17O_OH), xycoords='data',
             xytext=(prime(d18O_water), Dp17O_water), textcoords='data',
-            arrowprops=dict(arrowstyle="<|-|>", color="#814997", lw=1.5), zorder = -1)
+            arrowprops=dict(arrowstyle="<|-|>", color="#EC0016", lw=1.5), zorder = -1)
 
 # OH- equilibrium
 ax.scatter(prime(d18O_OH_eq), Dp17O_OH_eq,
-           marker="s", fc="#FFBB00", ec="k", label=r"OH$_{eq}^{-}$")
+           marker="s", fc="k")
 ax.text(prime(d18O_OH_eq)-2, Dp17O_OH_eq,
-        r"OH$_{eq}^{-}$",
-        ha="right", va="center", color="#FFBB00")
+        r"OH$^{-}$",
+        ha="right", va="center", color="k")
 print(f"\nThe difference in Dp17O between effective and equilibrium OH- is {Dp17O_OH-Dp17O_OH_eq:.0f} ppm")
 
 # Line between equilibrium OH- and water
-ax.text(0, -10,
-        r"$\theta_{H_2O/OH^-}^{eq}$ = " + f"{theta_eq_H2O_OH}",
-        ha="right", va="center", color="#63A615")
+ax.text(0, -15,
+        r"$\theta_{H_2O/OH^-}^{equilibrium}$ = " + f"{theta_eq_H2O_OH}",
+        ha="right", va="center", color="#EC0016")
 ax.annotate("", xy=(prime(d18O_OH_eq), Dp17O_OH_eq), xycoords='data',
             xytext=(prime(d18O_water), Dp17O_water), textcoords='data',
-            arrowprops=dict(arrowstyle="<|-|>", color="#63A615", lw=1.5), zorder = -1)
+            arrowprops=dict(arrowstyle="<|-|>", color="#EC0016", lw=1.5), zorder = -1)
 
 # Line between effective OH- equilibrium OH-
 grahams_law = np.round((np.log((16+1)/(17+1)))/(np.log((16+1)/(18+1))),3)
 print(f"\nThe KIE theta is: {theta_kinetic}. The expected value based on Graham's law is: {grahams_law}")
 ax.text((prime(d18O_OH) + prime(d18O_OH_eq))/2+10, (Dp17O_OH + Dp17O_OH_eq)/2,
         r"$\theta_{OH^-}^{KIE}$ = " + f"{theta_kinetic}  \n(±{theta_kinetic_err})",
-        ha="right", va="top", color="#FF7A00",
+        ha="right", va="top", color="#EC0016",
         bbox=dict(fc='white', ec="None", alpha=0.8, pad=0.1))
 ax.annotate("", xy=(prime(d18O_OH), Dp17O_OH), xycoords='data',
             xytext=(prime(d18O_OH_eq), Dp17O_OH_eq), textcoords='data',
-            arrowprops=dict(arrowstyle="-|>", color="#FF7A00", lw=1.5), zorder = -1)
+            arrowprops=dict(arrowstyle="-|>", color="#EC0016", lw=1.5), zorder = -1)
 
 # CO2
 ax.scatter(prime(d18O_CO2), Dp17O_CO2,
-           marker="D", fc="#00A099", ec="k", label="CO$_2$")
+           marker="D", fc="k", ec="k", label="CO$_2$")
 ax.errorbar(prime(d18O_CO2), Dp17O_CO2, xerr=d18O_CO2_err, yerr=Dp17O_CO2_err,
-            fmt="None", ecolor="#00A099", elinewidth=0.5, zorder=-1)
+            fmt="None", ecolor="k", zorder=-1)
 ax.text(prime(d18O_CO2)-2, Dp17O_CO2,
         "CO$_2$",
-        ha="right", va="center", color="#00A099")
+        ha="right", va="center", color="k")
 
 # Precipitate
 ax.scatter(prime(d18O_precipitate), Dp17O_precipitate,
            marker="o", c="#38342F", ec="k", label="precipitates")
 ax.errorbar(prime(d18O_precipitate), Dp17O_precipitate, xerr=d18O_precipitate_err, yerr=Dp17O_precipitate_err,
-            fmt="None", ecolor="#38342F", elinewidth=0.5, zorder=-1)
+            fmt="None", ecolor="#38342F", zorder=-1)
 ax.text(prime(d18O_precipitate), (Dp17O_precipitate+20), "witherite\nprecipitates",
         ha="center", va="bottom", color="#38342F",
         bbox=dict(fc='white', ec="None", alpha=0.8, pad=0.1))
@@ -370,7 +370,7 @@ d17OBaCO3 = d17Ocal(22+273.15, d17O(d18O_water, Dp17O_water))
 ax.scatter(prime(d18OBaCO3), Dp17O(d17OBaCO3, d18OBaCO3),
            marker="o", c="w", ec = "k", label="equilibrium carbonate")
 ax.text(prime(d18OBaCO3), Dp17O(d17OBaCO3, d18OBaCO3)+10, "equilibrium\ncarbonate",
-        ha="center", va="bottom", color="#878C96")
+        ha="center", va="bottom", color="k")
 
 # Mixing curve between KIE OH- and CO2
 mixdf = mix_d17O(d18O_OH, D17O_A=Dp17O_OH, d18O_B=d18O_CO2, D17O_B=Dp17O_CO2)
