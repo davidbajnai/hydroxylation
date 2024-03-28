@@ -41,13 +41,19 @@ def d17O(d18O, Dp17O):
 
 
 def a18cal(T):
+
     # Hayles et al. (2018) - calcite
     B_calcite = 7.027321E+14 / T**7 + -1.633009E+13 / T**6 + 1.463936E+11 / T**5 + -5.417531E+08 / T**4 + -4.495755E+05 / T**3  + 1.307870E+04 / T**2 + -5.393675E-01 / T + 1.331245E-04
     B_water = -6.705843E+15 / T**7 + 1.333519E+14 / T**6 + -1.114055E+12 / T**5 + 5.090782E+09 / T**4 + -1.353889E+07 / T**3 + 2.143196E+04 / T**2 + 5.689300 / T + -7.839005E-03
     return np.exp(B_calcite) / np.exp(B_water)
 
+    # Daeron et al. (2019) - calcite
+    # hydroxylation theta for seawater becomes 0.533(+0.001), for lakewater 0.541(+0.002)
+    # return np.exp((17.57 * 1000 / T - 29.13) / 1000)
+
 
 def theta_cal(T):
+
     # Hayles et al. (2018) - calcite
     K_calcite = 1.019124E+09 / T**5 + -2.117501E+07 / T**4 + 1.686453E+05 / T**3 + -5.784679E+02 / T**2 + 1.489666E-01 / T + 0.5304852
     B_calcite = 7.027321E+14 / T**7 + -1.633009E+13 / T**6 + 1.463936E+11 / T**5 + -5.417531E+08 / T**4 + -4.495755E+05 / T**3  + 1.307870E+04 / T**2 + -5.393675E-01 / T + 1.331245E-04
@@ -103,7 +109,7 @@ def a18OH(T=273.15+22, eq="Z20-X3LYP"):
     return e18_H2O_OH / 1000 + 1
 
 
-def a17OH(T = 273.15+22, eq = "Z20-X3LYP", theta = 0.5296):
+def a17OH(T=273.15+22, eq="Z20-X3LYP", theta=0.5296):
     return a18OH(T, eq)**theta
 
 
@@ -130,15 +136,15 @@ def calculate_theta(d18O_A, Dp17O_A, d18O_B, Dp17O_B):
     return theta
 
 
-def apply_theta(d18O_A, Dp17O_A, d18O_B = None, shift_d18O = None, theta = None):
-    
+def apply_theta(d18O_A, Dp17O_A, d18O_B=None, shift_d18O=None, theta=None):
+
     if d18O_B == None:
         d18O_B = d18O_A + shift_d18O
-    
+
     a18 = (d18O_B + 1000) / (d18O_A + 1000)
     a17 = a18**theta
 
-    d17O_B =a17 * (d17O(d18O_A, Dp17O_A) + 1000) - 1000 
+    d17O_B = a17 * (d17O(d18O_A, Dp17O_A) + 1000) - 1000
     Dp17O_B = Dp17O(d17O_B, d18O_B)
 
     return Dp17O_B
@@ -164,13 +170,13 @@ d17O_CO2 = d17O(d18O_CO2, Dp17O_CO2)
 CO2_KIE_shift = -3
 CO2_KIE_theta = (np.log((12+16+16)/(12+17+16)))/(np.log((12+16+16)/(12+18+16)))
 d18O_CO2_KIE = d18O_CO2 + CO2_KIE_shift
-Dp17O_CO2_KIE = apply_theta(d18O_CO2, Dp17O_CO2, shift_d18O = CO2_KIE_shift, theta = CO2_KIE_theta)
+Dp17O_CO2_KIE = apply_theta(d18O_CO2, Dp17O_CO2, shift_d18O=CO2_KIE_shift, theta=CO2_KIE_theta)
 
 # Line between CO2 and CO2 KIE
 ax1.text((prime(d18O_CO2) + prime(d18O_CO2_KIE))/2 + 5, (Dp17O_CO2 + Dp17O_CO2_KIE)/2,
-        r"$\theta_{CO_2}^{KIE}$ = " + f"{CO2_KIE_theta:.3f}",
-        ha="left", va="center", color="k",
-        bbox=dict(fc='white', ec="None", alpha=0.8, pad=0.1))
+         r"$\theta_{CO_2}^{KIE}$ = " + f"{CO2_KIE_theta:.3f}",
+         ha="left", va="center", color="k",
+         bbox=dict(fc='white', ec="None", alpha=0.8, pad=0.1))
 ax1.annotate("",
              xy=(prime(d18O_CO2), Dp17O_CO2),
              xytext=(prime(d18O_CO2_KIE), Dp17O_CO2_KIE),
@@ -188,12 +194,12 @@ Dp17O_OH_eff = Dp17O(d17O_OH_eff, d18O_OH_eff)
 
 # Line between effective OH- equilibrium OH-
 ax1.text((prime(d18O_OH_eff) + prime(d18O_OH_eq))/2+5, (Dp17O_OH_eff + Dp17O_OH_eq)/2,
-        r"$\theta_{OH^-}^{KIE}$ = 0.514",
-        ha="left", va="center", color="k",
-        bbox=dict(fc='white', ec="None", alpha=0.8, pad=0.1))
+         r"$\theta_{OH^-}^{KIE}$ = 0.514",
+         ha="left", va="center", color="k",
+         bbox=dict(fc='white', ec="None", alpha=0.8, pad=0.1))
 ax1.annotate("", xy=(prime(d18O_OH_eff), Dp17O_OH_eff), xycoords='data',
-            xytext=(prime(d18O_OH_eq), Dp17O_OH_eq), textcoords='data',
-            arrowprops=dict(arrowstyle="-|>", color="k", lw=1))
+             xytext=(prime(d18O_OH_eq), Dp17O_OH_eq), textcoords='data',
+             arrowprops=dict(arrowstyle="-|>", color="k", lw=1))
 
 # Carbonate precipitating in equilibrium
 d18Occ = d18Ocal(22+273.15, d18O_water)
@@ -201,9 +207,10 @@ d17Occ = d17Ocal(22+273.15, d17O(d18O_water, Dp17O_water))
 Dp17Occ = Dp17O(d17Occ, d18Occ)
 
 # Hydroxylation endmember
-mixdfKIE = mix_d17O(d18O_OH_eff, D17O_A=Dp17O_OH_eff, d18O_B=d18O_CO2_KIE, D17O_B=Dp17O_CO2_KIE)
+mixdfKIE = mix_d17O(d18O_OH_eff, D17O_A=Dp17O_OH_eff,
+                    d18O_B=d18O_CO2_KIE, D17O_B=Dp17O_CO2_KIE)
 ax1.plot(prime(mixdfKIE["mix_d18O"]), mixdfKIE["mix_Dp17O"],
-        color="k", lw=.5, ls=":", zorder=-10)
+         color="k", lw=.5, ls=":", zorder=-10)
 d18Occ_OHeff_KIE = mixdfKIE["mix_d18O"].iloc[67]
 Dp17Occ_OHeff_KIE = mixdfKIE["mix_Dp17O"].iloc[67]
 
