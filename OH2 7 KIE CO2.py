@@ -6,6 +6,7 @@
 # Import libraries
 import pandas as pd
 import numpy as np
+from functions import *
 
 
 # Functions that make life easier
@@ -24,10 +25,6 @@ def a18OH(T=273.15+22, eq="Z20-X3LYP"):
         e18_H2O_OH = -0.035 * (T-273.15) + 40.1
 
     return e18_H2O_OH / 1000 + 1
-
-
-def B_from_a(a, A):
-    return (A + 1000) / a - 1000
 
 
 # The *revised* Table 7 in Christensen et al. (2021)

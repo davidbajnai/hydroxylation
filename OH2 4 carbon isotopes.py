@@ -6,9 +6,9 @@
 # >>>>>>>>>
 
 # Import libraries
+import os
 import sys
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 
 # Plot parameters
@@ -20,16 +20,18 @@ plt.rcParams["patch.linewidth"] = 0.5
 plt.rcParams["figure.figsize"] = (9, 4)
 plt.rcParams["savefig.dpi"] = 800
 plt.rcParams["savefig.bbox"] = "tight"
+plt.rcParams['savefig.transparent'] = False
+plt.rcParams['mathtext.default'] = 'regular'
 
 # Import data from CSV files
-df = pd.read_csv(sys.path[0] + "/OH2 Table S4.csv", sep=",")
+df = pd.read_csv(os.path.join(sys.path[0], "OH2 Table S4.csv"))
 df["SampleName"] = df["SampleName"].str.replace("Exp", "")
 
 # Calculate the d13C offset
 d13C_CO2 = -4.89 # the d13C of the CO2 used for the experiments
 df['d13COffset'] = df['d13C'] - d13C_CO2
 
-df_tripleO = pd.read_csv(sys.path[0] + "/OH2 Table S3.csv")
+df_tripleO = pd.read_csv(os.path.join(sys.path[0], "OH2 Table S3.csv"))
 df_tripleO["SampleName"] = df_tripleO["SampleName"].str.replace("Exp", "")
 
 # Merge the TILDAS and KIEL data
@@ -47,10 +49,10 @@ df_excluded = df[df['SampleName'].str.contains(samples_not_measured)]
 
 ax1.scatter(df_included['d13C'], df_included['d18O'],
             color="#38342F", marker='o', s=50, zorder=0,
-            label="measured for $\Delta^{\prime 17}$O")
+            label="measured for $\Delta\prime^{17}$O")
 ax1.scatter(df_excluded['d13C'], df_excluded['d18O'],
             color="#9C9A8E", marker='o', s=50, zorder=-1,
-            label="not measured for $\Delta^{\prime 17}$O")
+            label="not measured for $\Delta\prime^{17}$O")
 ax1.errorbar(df['d13C'], df["d18O"],
              yerr=df["d18O_error"],
              xerr=df["d13C_error"],
@@ -103,9 +105,9 @@ for i, txt in enumerate(dfMerged['SampleName']):
              ha="center", va="center", size=5, color="w")
 
 ax2.set_xlabel("$\delta^{13}$C (‰, VPDB)")
-ax2.set_ylabel("$\Delta^{\prime 17}$O (ppm)")
+ax2.set_ylabel("$\Delta\prime^{17}$O (ppm)")
 ax2.text(0.02, 0.98, "B", size=14, ha="left", va="top",
          transform=ax2.transAxes, fontweight="bold")
 
-plt.savefig(sys.path[0] + "/OH2 Figure 2.png")
+plt.savefig(os.path.join(sys.path[0], "OH2 Figure 2.png"))
 plt.close("all")

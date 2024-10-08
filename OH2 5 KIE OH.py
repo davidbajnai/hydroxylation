@@ -6,10 +6,12 @@
 # >>>>>>>>>
 
 # Import libraries
+import os
 import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from functions import *
 
 # Plot parameters
 plt.rcParams.update({'font.size': 7})
@@ -21,23 +23,10 @@ plt.rcParams["patch.linewidth"] = 0.5
 plt.rcParams["figure.figsize"] = (4, 4)
 plt.rcParams["savefig.dpi"] = 800
 plt.rcParams["savefig.bbox"] = "tight"
+plt.rcParams['savefig.transparent'] = False
+plt.rcParams['mathtext.default'] = 'regular'
 
 # Functions that make life easier
-
-def prime(x):
-    return 1000 * np.log(x / 1000 + 1)
-
-def unprime(x):
-    return (np.exp(x / 1000) - 1) * 1000
-
-
-def Dp17O(d17O, d18O):
-    return ((1000 * np.log(d17O / 1000 + 1)) - 0.528 * (1000 * np.log(d18O / 1000 + 1))) * 1000
-
-
-def d17O(d18O, Dp17O):
-    return unprime(Dp17O/1000 + 0.528 * prime(d18O))
-
 
 def a18cal(T):
     # Hayles et al. (2018) - calcite
@@ -89,26 +78,9 @@ def a17OH(T = 273.15+22, eq = "Z20-X3LYP", theta = 0.530):
     return a18OH(T, eq)**theta
 
 
-def B_from_a(a, A):
-    return (A + 1000) / a - 1000
-
-
-def A_from_a(a, B):
-    return (B + 1000) * a - 1000
-
-
-def epsilon(d18O_A, d18O_B):
-    return ((d18O_A + 1000) / (d18O_B + 1000) - 1) * 1000
-
-
-def elena(d18O_A, d18O_B):
-    elena = 1000*np.log((d18O_A + 1000) / (d18O_B + 1000))
-    return elena
-
-
 # Read in data
-df = pd.read_csv(sys.path[0] + "/OH2 Table S3.csv", sep=",")
-df_BH21_york_err = pd.read_csv(sys.path[0] + "/OH2 BH21 york error.csv", sep=",")
+df = pd.read_csv(os.path.join(sys.path[0], "OH2 Table S3.csv"))
+df_BH21_york_err = pd.read_csv(os.path.join(sys.path[0], "OH2 BH21 york error.csv"))
 
 # Isotope composition of CO2 gas
 d18O_CO2 = df.loc[df['SampleName'] == 'KoelnRefCO2-2', 'd18O_CO2'].iloc[0]
@@ -184,5 +156,5 @@ ax.legend(loc = "upper right")
 ax.set_ylabel(r"10$^3$ ln $\alpha_{H_2O/OH^-}^{18}$")
 ax.set_xlabel("Temperature (°C)")
 
-plt.savefig(sys.path[0] + "/OH2 Figure 3.png")
+plt.savefig(os.path.join(sys.path[0], "OH2 Figure 3.png"))
 plt.close("all")

@@ -5,10 +5,12 @@
 # >>>>>>>>>
 
 # Import libraries
+import os
 import sys
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from functions import *
+
 
 # Plotting parameters
 plt.rcParams.update({'font.size': 7})
@@ -20,25 +22,10 @@ plt.rcParams["patch.linewidth"] = 0.5
 plt.rcParams["figure.figsize"] = (9, 4)
 plt.rcParams["savefig.dpi"] = 800
 plt.rcParams["savefig.bbox"] = "tight"
+plt.rcParams['savefig.transparent'] = False
+plt.rcParams['mathtext.default'] = 'regular'
 
 # Functions that make life easier
-
-
-def prime(x):
-    return 1000 * np.log(x / 1000 + 1)
-
-
-def unprime(x):
-    return (np.exp(x / 1000) - 1) * 1000
-
-
-def Dp17O(d17O, d18O):
-    return ((1000 * np.log(d17O / 1000 + 1)) - 0.528 * (1000 * np.log(d18O / 1000 + 1))) * 1000
-
-
-def d17O(d18O, Dp17O):
-    return unprime(Dp17O/1000 + 0.528 * prime(d18O))
-
 
 def a18cal(T):
 
@@ -75,25 +62,6 @@ def d17Ocal(T, d17Ow):
     return a17cal(T) * (d17Ow+1000) - 1000
 
 
-def mix_d17O(d18O_A, d17O_A=None, D17O_A=None, d18O_B=None, d17O_B=None, D17O_B=None, step=100):
-    ratio_B = np.arange(0, 1+1/step, 1/step)
-
-    if d17O_A is None:
-        d17O_A = unprime(D17O_A/1000 + 0.528 * prime(d18O_A))
-
-    if d17O_B is None:
-        d17O_B = unprime(D17O_B/1000 + 0.528 * prime(d18O_B))
-
-    mix_d18O = ratio_B * float(d18O_B) + (1 - ratio_B) * float(d18O_A)
-    mix_d17O = ratio_B * float(d17O_B) + (1 - ratio_B) * float(d17O_A)
-    mix_D17O = Dp17O(mix_d17O, mix_d18O)
-    xB = ratio_B * 100
-
-    df = pd.DataFrame(
-        {'mix_d17O': mix_d17O, 'mix_d18O': mix_d18O, 'mix_Dp17O': mix_D17O, 'xB': xB})
-    return df
-
-
 def a18OH(T=273.15+22, eq="Z20-X3LYP"):
     if (eq == "Z20-X3LYP"):
         e18_H2O_OH = (-4.4573 + (10.3255 * 10**3) /
@@ -113,46 +81,8 @@ def a17OH(T=273.15+22, eq="Z20-X3LYP", theta=0.5296):
     return a18OH(T, eq)**theta
 
 
-def B_from_a(a, A):
-    return (A + 1000) / a - 1000
-
-
-def A_from_a(a, B):
-    return (B + 1000) * a - 1000
-
-
-def epsilon(d18O_A, d18O_B):
-    epsilon = ((d18O_A + 1000) / (d18O_B + 1000) - 1) * 1000
-    return epsilon
-
-
-def calculate_theta(d18O_A, Dp17O_A, d18O_B, Dp17O_B):
-
-    a18 = (d18O_B + 1000) / (d18O_A + 1000)
-    a17 = (d17O(d18O_B, Dp17O_B) + 1000) / (d17O(d18O_A, Dp17O_A) + 1000)
-
-    theta = round(np.log(a17) / np.log(a18), 4)
-
-    return theta
-
-
-def apply_theta(d18O_A, Dp17O_A, d18O_B=None, shift_d18O=None, theta=None):
-
-    if d18O_B == None:
-        d18O_B = d18O_A + shift_d18O
-
-    a18 = (d18O_B + 1000) / (d18O_A + 1000)
-    a17 = a18**theta
-
-    d17O_B = a17 * (d17O(d18O_A, Dp17O_A) + 1000) - 1000
-    Dp17O_B = Dp17O(d17O_B, d18O_B)
-
-    return Dp17O_B
-
-
 # Create Figure 5
 fig, (ax1, ax2) = plt.subplots(1, 2)
-
 
 # Subpolot A: lakewater
 
@@ -264,8 +194,8 @@ plt.text(0.98, 0.98, "A", size=14, ha="right", va="top",
          transform=ax1.transAxes, fontweight="bold")
 
 # Axis properties
-ax1.set_xlabel("$\delta^{\prime 18}$O (‰, VSMOW)")
-ax1.set_ylabel("$\Delta^{\prime 17}$O (ppm)")
+ax1.set_xlabel("$\delta\prime^{18}$O (‰, VSMOW)")
+ax1.set_ylabel("$\Delta\prime^{17}$O (ppm)")
 ax1.set_xlim(-55, 85)
 ax1.set_ylim(-260, 260)
 
@@ -373,15 +303,15 @@ ax2.annotate("", xy=(prime(d18Occ), Dp17Occ), xycoords='data',
             xytext=(prime(d18Occ_OHeff_KIE), Dp17Occ_OHeff_KIE), textcoords='data',
             arrowprops=dict(arrowstyle="<|-", color="#EC0016", lw=2), zorder=-1)
 
-plt.text(0.98, 0.98, "B", size=14, ha="right", va="top",
+ax2.text(0.98, 0.98, "B", size=14, ha="right", va="top",
          transform=ax2.transAxes, fontweight="bold")
 
 # Axis properties
-ax2.set_xlabel("$\delta^{\prime 18}$O (‰, VSMOW)")
-ax2.set_ylabel("$\Delta^{\prime 17}$O (ppm)")
+ax2.set_xlabel("$\delta\prime^{18}$O (‰, VSMOW)")
+ax2.set_ylabel("$\Delta\prime^{17}$O (ppm)")
 ax2.set_xlim(-55, 85)
 ax2.set_ylim(-260, 260)
 
 # save the figure
-plt.savefig(sys.path[0] + "/OH2 Figure 5.png")
+plt.savefig(os.path.join(sys.path[0], "OH2 Figure 5.png"))
 plt.close("all")

@@ -7,10 +7,13 @@
 # >>>>>>>>>
 
 # Import libraries
+import os
 import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from functions import *
+
 
 # Plot parameters
 plt.rcParams.update({'font.size': 7})
@@ -21,21 +24,11 @@ plt.rcParams["patch.linewidth"] = 0.5
 plt.rcParams["figure.figsize"] = (9, 4)
 plt.rcParams["savefig.dpi"] = 800
 plt.rcParams["savefig.bbox"] = "tight"
+plt.rcParams['savefig.transparent'] = False
+plt.rcParams['mathtext.default'] = 'regular'
 
 
-# Define functions that make life easier
-def prime(delta):
-    return 1000 * np.log(delta/1000 + 1)
-
-
-def unprime(dprime):
-    return (np.exp(dprime/1000) - 1) * 1000
-
-
-def Dp17O(d17O, d18O):
-    return (prime(d17O) - 0.528 * prime(d18O)) * 1000
-
-
+# Function to print info for scaled samples
 def print_info(df, d18O_col, Dp17O_col, sample_name):
     gas_subset = df[df["SampleName"].str.contains(sample_name)].copy()
     d18O_mean = gas_subset[d18O_col].mean()
@@ -46,7 +39,7 @@ def print_info(df, d18O_col, Dp17O_col, sample_name):
     print(f"{sample_name}, N = {N_gas}, d18O = {d18O_mean:.3f}(±{d18O_std:.3f})‰, ∆'17O = {Dp17O_mean:.0f}(±{Dp17O_std:.0f}) ppm", end="")
 
 
-# This function applies the acid fractionation factor based on the mineralogy
+# Function to apply the acid fractionation factor based on the mineralogy
 def applyAFF(d18O_CO2, d17O_CO2, mineral):
 
     # Acid fractionation correction
@@ -143,13 +136,13 @@ def scaleData(df, project):
                              fmt="none", color="#cacaca", zorder=0)
         
         plt.title(f"Measurement period: {period}")
-        plt.ylabel("$\Delta^{\prime 17}$O (ppm, unscaled CO$_2$)")
+        plt.ylabel("$\Delta\prime^{17}$O (ppm, unscaled CO$_2$)")
         plt.xlabel("Measurement date")
         plt.legend(loc='upper right', bbox_to_anchor=(1.18, 1))
         plt.text(0.98, 0.98, SuppFig[FigNum], size=14, ha="right", va="top",
                  transform=ax.transAxes, fontweight="bold")
 
-        plt.savefig(sys.path[0] + "/" + f"{project} Figure S2{SuppFig[FigNum]}.png")
+        plt.savefig(os.path.join(sys.path[0], f"{project} Figure S2{SuppFig[FigNum]}.png"))
         plt.close()
 
         # Exclude the standards from the exported dataframe
@@ -181,7 +174,7 @@ def average_data(df):
 # Here we go!
 
 # Scale the data
-df = scaleData(pd.read_csv(sys.path[0] + "/OH2 Table S2.csv"), "OH2")
+df = scaleData(pd.read_csv(os.path.join(sys.path[0], "OH2 Table S2.csv")), "OH2")
 
 # Average the data
 df_avg = average_data(df)
@@ -192,8 +185,8 @@ df_avg[["d18O_AC", "d17O_AC", "Dp17O_AC"]] = df_avg.apply(lambda x: applyAFF(x["
 # Print out and export the scaled data
 print("\nAll sample replicates averaged:")
 print(df_avg.round({"Dp17O_CO2": 0, "Dp17O_error": 0, "Dp17O_AC": 0}).round(3))
-df_avg.to_csv(sys.path[0] + "/OH2 Table S3.csv", index=False)
-# df_avg.to_excel(sys.path[0] + "/OH2 Table S3.xlsx", index=False)
+df_avg.to_csv(os.path.join(sys.path[0], "OH2 Table S3.csv"), index=False)
+# df_avg.to_excel(os.path.join(sys.path[0], "OH2 Table S3.xlsx"), index=False)
 
 # Exclude the KoelnRefCO2-2 from the dataset for additional figures
 df_avg = df_avg[~df_avg["SampleName"].str.contains("KoelnRefCO2-2")].reset_index(drop=True)
@@ -225,8 +218,8 @@ for cat in categories:
 
 ax1.text(0.98, 0.98, "A", size=14, ha="right", va="top",
          transform=ax1.transAxes, fontweight="bold")
-ax1.set_ylabel("$\Delta^{\prime 17}$O (ppm, CO$_2$)")
-ax1.set_xlabel("$\delta^{\prime 18}$O (‰, VSMOW, CO$_2$)")
+ax1.set_ylabel("$\Delta\prime^{17}$O (ppm, CO$_2$)")
+ax1.set_xlabel("$\delta\prime^{18}$O (‰, VSMOW, CO$_2$)")
 
 ylim = ax1.get_ylim()
 xlim = ax1.get_xlim()
@@ -245,13 +238,13 @@ for cat in categories:
 ax2.text(0.98, 0.98, "B", size=14, ha="right", va="top",
          transform=ax2.transAxes, fontweight="bold")
 
-ax2.set_ylabel("$\Delta^{\prime 17}$O (ppm, CO$_2$)")
-ax2.set_xlabel("$\delta^{\prime 18}$O (‰, VSMOW, CO$_2$)")
+ax2.set_ylabel("$\Delta\prime^{17}$O (ppm, CO$_2$)")
+ax2.set_xlabel("$\delta\prime^{18}$O (‰, VSMOW, CO$_2$)")
 
 ax2.set_ylim(ylim)
 ax2.set_xlim(xlim)
 
 ax2.legend(loc='upper right', bbox_to_anchor=(1.25, 1))
 
-plt.savefig(sys.path[0] + "/" + "OH2 Figure S3.png")
+plt.savefig(os.path.join(sys.path[0], "OH2 Figure S3.png"))
 plt.close("all")

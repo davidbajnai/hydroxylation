@@ -8,10 +8,11 @@
 # >>>>>>>>>
 
 # Import libraries
+import os
 import sys
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+from functions import *
 
 # Plot parameters
 plt.rcParams.update({'font.size': 7})
@@ -22,27 +23,11 @@ plt.rcParams["patch.linewidth"] = 0.5
 plt.rcParams["figure.figsize"] = (9, 4)
 plt.rcParams["savefig.dpi"] = 800
 plt.rcParams["savefig.bbox"] = "tight"
+plt.rcParams['savefig.transparent'] = False
+plt.rcParams['mathtext.default'] = 'regular'
 
 
-# Functions that make life easier
-def prime(delta):
-    dprime = 1000 * np.log(delta/1000 + 1)
-    return dprime
-
-
-def unprime(dprime):
-    delta = (np.exp(dprime/1000) - 1) * 1000
-    return delta
-
-
-def Dp17O(d17O, d18O):
-    return (prime(d17O) - 0.528 * prime(d18O)) * 1000
-
-
-def to_VSMOW(VPDB):
-    return (VPDB*1.03092)+30.92
-
-
+# Function to print info for scaled samples
 def print_info(df, d18O_col, Dp17O_col, sample_name):
     gas_subset = df[df["SampleName"].str.contains(sample_name)].copy()
     d18O_mean = gas_subset[d18O_col].mean()
@@ -54,7 +39,7 @@ def print_info(df, d18O_col, Dp17O_col, sample_name):
 
 
 # Read data from Table S1
-df = pd.read_csv(sys.path[0] + "/" + "OH2 Table S2.csv")
+df = pd.read_csv(os.path.join(sys.path[0], "OH2 Table S2.csv"))
 df = df[df["measurementPeriod"].str.contains("2023-09-20 to 2023-10-08")]
 df = df[df["SampleName"].str.contains("light|heavy|NBS18|IAEA")]
 
@@ -69,9 +54,12 @@ print_info(df, "d18O", "Dp17O", "NBS18"); print("\t<--- unscaled")
 # Measured CO2 values
 IAEA603_d18O_measured = df[df["SampleName"].str.contains("IAEA603")]["d18O"].mean()
 IAEA603_d17O_measured = df[df["SampleName"].str.contains("IAEA603")]["d17O"].mean()
+print("\nMeasured values:")
+print(f"IAEA-603: d18O = {IAEA603_d18O_measured:.3f}‰, d17O = {IAEA603_d17O_measured:.3f}‰")
 
 NBS18_d18O_measured = df[df["SampleName"].str.contains("NBS18")]["d18O"].mean()
 NBS18_d17O_measured = df[df["SampleName"].str.contains("NBS18")]["d17O"].mean()
+print(f"NBS-18: d18O = {NBS18_d18O_measured:.3f}‰, d17O = {NBS18_d17O_measured:.3f}‰")
 
 # Accepted CO2 values
 IAEA603_d18O_accepted = (to_VSMOW(-2.37) + 1000) * 1.01025 - 1000
@@ -88,7 +76,6 @@ print(f"NBS-18: d18O = {NBS18_d18O_accepted:.3f}‰, ∆'17O = {NBS18_Dp17O_acce
 # Calculate the scaling factors
 slope_d18O = (NBS18_d18O_accepted - IAEA603_d18O_accepted) / (NBS18_d18O_measured - IAEA603_d18O_measured)
 intercept_d18O = IAEA603_d18O_accepted - slope_d18O * IAEA603_d18O_measured
-
 slope_d17O = (NBS18_d17O_accepted - IAEA603_d17O_accepted) / (NBS18_d17O_measured - IAEA603_d17O_measured)
 intercept_d17O = IAEA603_d17O_accepted - slope_d17O * IAEA603_d17O_measured
 
@@ -96,7 +83,6 @@ intercept_d17O = IAEA603_d17O_accepted - slope_d17O * IAEA603_d17O_measured
 df["d18O_scaled"] = slope_d18O*df['d18O']+intercept_d18O
 df["d17O_scaled"] = slope_d17O*df['d17O']+intercept_d17O
 df["Dp17O_scaled"] = Dp17O(df["d17O_scaled"], df["d18O_scaled"])
-
 
 # Calculate the mean and SD of the replicate measurements
 df_gases = df.loc[:, ["SampleName", "d18O_scaled", "Dp17O_scaled"]]
@@ -128,7 +114,7 @@ ax1.text(0.98, 0.98, "A", size=14, ha="right", va="top",
          transform=ax1.transAxes, fontweight="bold")
 ax1.set_title("IAEA-603")
 ax1.set_xlabel("$\delta^{18}$O (‰, unscaled)")
-ax1.set_ylabel("$\Delta^{\prime 17}$O (ppm, unscaled)")
+ax1.set_ylabel("$\Delta\prime^{17}$O (ppm, unscaled)")
 
 # Plot NBS-18 data
 ax2.scatter(df_NBS18["d18O"], df_NBS18["Dp17O"],
@@ -141,7 +127,7 @@ ax2.text(0.98, 0.98, "B", size=14, ha="right", va="top",
          transform=ax2.transAxes, fontweight="bold")
 ax2.set_title("NBS-18")
 ax2.set_xlabel("$\delta^{18}$O (‰, unscaled)")
-ax2.set_ylabel("$\Delta^{\prime 17}$O (ppm, unscaled)")
+ax2.set_ylabel("$\Delta\prime^{17}$O (ppm, unscaled)")
 
-plt.savefig(sys.path[0] + "/" + "OH2 Figure S1.png")
+plt.savefig(os.path.join(sys.path[0], "OH2 Figure S1.png"))
 plt.close("all")

@@ -1,15 +1,17 @@
 # This code creates Figures 3 and 4 of the manuscript
 
 # INPUT: OH2 Table S3.csv
-# OUTPUT: OH2 Figure 4.png
+# OUTPUT: OH2 Figure 4.png, OH2 Graphical Abstract.png
 
 # >>>>>>>>>
 
 # Import libraries
+import os
 import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from functions import *
 
 # Plot parameters
 plt.rcParams.update({'font.size': 7})
@@ -21,33 +23,11 @@ plt.rcParams["patch.linewidth"] = 0.5
 plt.rcParams["figure.figsize"] = (4, 4)
 plt.rcParams["savefig.dpi"] = 800
 plt.rcParams["savefig.bbox"] = "tight"
+plt.rcParams['savefig.transparent'] = False
+plt.rcParams['mathtext.default'] = 'regular'
 
 
 # Functions that make life easier
-
-def prime(x):
-    return 1000 * np.log(x / 1000 + 1)
-
-
-def apply_prime_to_list(lst):
-    new_lst = []
-    for item in lst:
-        result = prime(item)
-        new_lst.append(result)
-    return new_lst
-
-
-def unprime(x):
-    return (np.exp(x / 1000) - 1) * 1000
-
-
-def Dp17O(d17O, d18O):
-    return ((1000 * np.log(d17O / 1000 + 1)) - 0.528 * (1000 * np.log(d18O / 1000 + 1))) * 1000
-
-
-def d17O(d18O, Dp17O):
-    return unprime(Dp17O/1000 + 0.528 * prime(d18O))
-
 
 def a18cal(T):
     # Hayles et al. (2018) - calcite
@@ -121,25 +101,6 @@ def plot_calcite_equilibrium(Dp17Ow, d18Ow, Tmin, Tmax, ax, fluid_name="precipit
     return equilibrium_df
 
 
-def mix_d17O(d18O_A, d17O_A=None, D17O_A=None, d18O_B=None, d17O_B=None, D17O_B=None, step=100):
-    ratio_B = np.arange(0, 1+1/step, 1/step)
-
-    if d17O_A is None:
-        d17O_A = unprime(D17O_A/1000 + 0.528 * prime(d18O_A))
-
-    if d17O_B is None:
-        d17O_B = unprime(D17O_B/1000 + 0.528 * prime(d18O_B))
-
-    mix_d18O = ratio_B * float(d18O_B) + (1 - ratio_B) * float(d18O_A)
-    mix_d17O = ratio_B * float(d17O_B) + (1 - ratio_B) * float(d17O_A)
-    mix_D17O = Dp17O(mix_d17O, mix_d18O)
-    xB = ratio_B * 100
-
-    df = pd.DataFrame(
-        {'mix_d17O': mix_d17O, 'mix_d18O': mix_d18O, 'mix_Dp17O': mix_D17O, 'xB': xB})
-    return df
-
-
 def a18OH(T=273.15+22, eq="Z20-X3LYP"):
     if (eq == "Z20-X3LYP"):
         e18_H2O_OH = (-4.4573 + (10.3255 * 10**3) /
@@ -159,31 +120,6 @@ def a17OH(T = 273.15+22, eq = "Z20-X3LYP", theta = 0.530):
     return a18OH(T, eq)**theta
 
 
-def B_from_a(a, A):
-    return (A + 1000) / a - 1000
-
-
-def A_from_a(a, B):
-    return (B + 1000) * a - 1000
-
-
-def epsilon(d18O_A, d18O_B):
-    epsilon = ((d18O_A + 1000) / (d18O_B + 1000) - 1) * 1000
-    return epsilon
-
-def elena(d18O_A, d18O_B):
-    elena = 1000*np.log((d18O_A + 1000) / (d18O_B + 1000))
-    return elena
-
-def calculate_theta(d18O_A, Dp17O_A, d18O_B, Dp17O_B):
-
-    a18 = (d18O_B + 1000) / (d18O_A + 1000)
-    a17 = (d17O(d18O_B, Dp17O_B) + 1000) / (d17O(d18O_A, Dp17O_A) + 1000)
-
-    theta = round(np.log(a17) / np.log(a18), 4)
-
-    return theta
-
 def calculate_OH(d18O_CO2, Dp17O_CO2, d18O_precipitate, Dp17O_precipitate):
     d18O_OH = (d18O_precipitate - 2/3 * d18O_CO2) * 3
     d17O_OH = (d17O(d18O_precipitate, Dp17O_precipitate) - 2/3 * d17O(d18O_CO2, Dp17O_CO2)) * 3
@@ -193,7 +129,7 @@ def calculate_OH(d18O_CO2, Dp17O_CO2, d18O_precipitate, Dp17O_precipitate):
 monte_carlo_iterations = 10**3
 
 # Read in TILDAS data
-df = pd.read_csv(sys.path[0] + "/OH2 Table S3.csv", sep=",")
+df = pd.read_csv(os.path.join(sys.path[0], "OH2 Table S3.csv"))
 
 # Isotope composition of CO2 gas
 d18O_CO2 = df.loc[df['SampleName'] == 'KoelnRefCO2-2', 'd18O_CO2'].iloc[0]
@@ -377,11 +313,11 @@ mixdf = mix_d17O(d18O_OH, D17O_A=Dp17O_OH, d18O_B=d18O_CO2, D17O_B=Dp17O_CO2)
 ax.plot(prime(mixdf["mix_d18O"]), mixdf["mix_Dp17O"],
         color="#282D37", lw=.5, ls=":", zorder=-2)
 
-ax.set_ylabel("$\Delta^{\prime 17}$O (ppm)")
-ax.set_xlabel("$\delta^{\prime 18}$O (‰, VSMOW)")
+ax.set_ylabel("$\Delta\prime^{17}$O (ppm)")
+ax.set_xlabel("$\delta\prime^{18}$O (‰, VSMOW)")
 
 # Save figure
-plt.savefig(sys.path[0] + "/OH2 Figure 4.png")
+plt.savefig(os.path.join(sys.path[0], "OH2 Figure 4.png"))
 plt.close("all")
 
 
@@ -456,8 +392,8 @@ ax.annotate("", xy=(prime(d18O_OH), Dp17O_OH), xycoords='data',
             arrowprops=dict(arrowstyle="-|>", color="w", lw=1.5), zorder = -1)
 
 # Axis parameters
-ax.set_ylabel("$\Delta^{\prime 17}$O")
-ax.set_xlabel("$\delta^{\prime 18}$O")
+ax.set_ylabel("$\Delta\prime^{17}$O")
+ax.set_xlabel("$\delta\prime^{18}$O")
 ax.set_ylim(-90, 290)
 ax.set_xlim(-53, -5)
 ax.set_xticklabels([])
@@ -466,5 +402,5 @@ ax.xaxis.set_ticks_position('none')
 ax.yaxis.set_ticks_position('none')
 
 # Save figure
-plt.savefig(sys.path[0] + "/OH2 Graphical Abstract.png")
+plt.savefig(os.path.join(sys.path[0], "OH2 Graphical Abstract.png"))
 plt.close("all")
