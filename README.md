@@ -10,14 +10,10 @@
 
 >[!TIP]
 >[Release published-version](https://github.com/davidbajnai/hydroxylation/releases/tag/V2) includes the original files used in the manuscript. The following changes has been made to the files:
-- Table S2 now includes additional measurement parameters, such as cell temperature.
-- Improvements to the repdocubility of the code
-- Improvements to the graphics
-- Evalauted values remained unchanged
+>- Table S2 now includes additional measurement parameters, such as cell temperature.
+>- Improvements to the repdocubility of the code
+>- Improvements to the graphics
+>- Evalauted values remained unchanged
 
 ## License
-Copyright (C) 2024 <a href="https://davidbajnai.eu">David Bajnai</a>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the [GNU General Public License version 3](LICENSE), or (at your option) any later version. This program is distributed in the hope that it will be useful,
-but without any warranty.
+All files in this repository are available under [CC0 1.0](LICENSE). No rights reserved.
