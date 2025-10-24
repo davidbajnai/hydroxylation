@@ -1,13 +1,12 @@
-# The following code is used to calculate KIE for CO2
-# based on the *revised* Table 7 in Christensen et al. (2021)
-
-# >>>>>>>>>
+"""
+The following code is used to calculate KIE for CO2
+based on the *revised* Table 7 in Christensen et al. (2021)
+"""
 
 # Import libraries
 import pandas as pd
 import numpy as np
 from functions import *
-
 
 # Functions that make life easier
 

@@ -1,17 +1,25 @@
-# This code is used to calculate the 18KIE for OH-
+"""
+This code is used to calculate the 18KIE for OH-
 
-# INPUT: OH2 Table S3.csv, OH2 BH21 york error.csv
-# OUTPUT: OH2 Figure 3.png
+INPUT:
+- OH2 Table S3.csv
+- OH2 BH21 york error.csv
 
-# >>>>>>>>>
+OUTPUT:
+- OH2 Figure 3.png
+"""
 
 # Import libraries
 import os
-import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from functions import *
+
+# Retrieve directory paths
+script_dir = os.path.dirname(os.path.abspath(__file__))
+data_dir = os.path.join(script_dir, '../data')
+figures_dir = os.path.join(script_dir, '../figures')
 
 # Plot parameters
 plt.rcParams.update({'font.size': 7})
@@ -79,8 +87,8 @@ def a17OH(T = 273.15+22, eq = "Z20-X3LYP", theta = 0.530):
 
 
 # Read in data
-df = pd.read_csv(os.path.join(sys.path[0], "OH2 Table S3.csv"))
-df_BH21_york_err = pd.read_csv(os.path.join(sys.path[0], "OH2 BH21 york error.csv"))
+df = pd.read_csv(os.path.join(data_dir, "OH2_Table_S3.csv"))
+df_BH21_york_err = pd.read_csv(os.path.join(data_dir, "OH2_BH21_york_error.csv"))
 
 # Isotope composition of CO2 gas
 d18O_CO2 = df.loc[df['SampleName'] == 'KoelnRefCO2-2', 'd18O_CO2'].iloc[0]
@@ -156,5 +164,5 @@ ax.legend(loc = "upper right")
 ax.set_ylabel(r"10$^3$ ln $\alpha_{H_2O/OH^-}^{18}$")
 ax.set_xlabel("Temperature (°C)")
 
-plt.savefig(os.path.join(sys.path[0], "OH2 Figure 3.png"))
+plt.savefig(os.path.join(figures_dir, "OH2_Figure_3.png"))
 plt.close("all")

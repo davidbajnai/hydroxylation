@@ -1,15 +1,23 @@
-# This code is used to plot carbon isotope data
+"""
+This code is used to plot carbon isotope data
 
-# INPUT: OH2 Table S3.csv
-# OUTPUT: OH2 Figure 2.png
+INPUT:
+- OH2 Table S3.csv
+- OH2 Table S4.csv
 
-# >>>>>>>>>
+OUTPUT:
+- OH2 Figure 2.png
+"""
 
 # Import libraries
 import os
-import sys
 import pandas as pd
 import matplotlib.pyplot as plt
+
+# Retrieve directory paths
+script_dir = os.path.dirname(os.path.abspath(__file__))
+data_dir = os.path.join(script_dir, '../data')
+figures_dir = os.path.join(script_dir, '../figures')
 
 # Plot parameters
 plt.rcParams.update({'font.size': 7})
@@ -24,14 +32,14 @@ plt.rcParams['savefig.transparent'] = False
 plt.rcParams['mathtext.default'] = 'regular'
 
 # Import data from CSV files
-df = pd.read_csv(os.path.join(sys.path[0], "OH2 Table S4.csv"))
+df = pd.read_csv(os.path.join(data_dir, "OH2_Table_S4.csv"))
 df["SampleName"] = df["SampleName"].str.replace("Exp", "")
 
 # Calculate the d13C offset
 d13C_CO2 = -4.89 # the d13C of the CO2 used for the experiments
 df['d13COffset'] = df['d13C'] - d13C_CO2
 
-df_tripleO = pd.read_csv(os.path.join(sys.path[0], "OH2 Table S3.csv"))
+df_tripleO = pd.read_csv(os.path.join(data_dir, "OH2_Table_S3.csv"))
 df_tripleO["SampleName"] = df_tripleO["SampleName"].str.replace("Exp", "")
 
 # Merge the TILDAS and KIEL data
@@ -39,6 +47,12 @@ dfMerged = pd.merge(df, df_tripleO, on="SampleName")
 
 # Create Figure 2
 fig, (ax1, ax2) = plt.subplots(1, 2, sharex=True)
+
+for ax in fig.get_axes():
+    i = fig.get_axes().index(ax)
+    ax.text(0.025, 0.975, chr(65 + i),
+            size=14, weight="bold", ha="left", va="top",
+            transform=ax.transAxes)
 
 # Subplot A
 
@@ -83,9 +97,6 @@ ax1.annotate("",
              xytext=(-4.8, 6.7),
              arrowprops=dict(arrowstyle="->,head_length=0.7,head_width=0.5", lw=1.5))
 
-ax1.text(0.02, 0.98, "A", size=14, ha="left", va="top",
-         transform=ax1.transAxes, fontweight="bold")
-
 ax1.set_xlabel("$\delta^{13}$C (‰, VPDB)")
 ax1.set_ylabel("$\delta^{18}$O (‰, VSMOW)")
 
@@ -106,8 +117,6 @@ for i, txt in enumerate(dfMerged['SampleName']):
 
 ax2.set_xlabel("$\delta^{13}$C (‰, VPDB)")
 ax2.set_ylabel("$\Delta\prime^{17}$O (ppm)")
-ax2.text(0.02, 0.98, "B", size=14, ha="left", va="top",
-         transform=ax2.transAxes, fontweight="bold")
 
-plt.savefig(os.path.join(sys.path[0], "OH2 Figure 2.png"))
+plt.savefig(os.path.join(figures_dir, "OH2_Figure_2.png"))
 plt.close("all")

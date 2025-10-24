@@ -1,18 +1,25 @@
-# The following code is used to scale the reference gases
-# based on the "accepted" values for IAEA-603 and NBS-18
-# from Wostbrock et al. (2020)
+"""
+This script was used in the original publication
+to scale the reference gases based on the accepted values
+for IAEA-603 and NBS-18 from Wostbrock et al. (2020).
 
-# INPUT: OH2 Table S2.csv
-# OUTPUT: OH2 Figure S1.png
+INPUT:
+- OH2 Table S2.csv
 
-# >>>>>>>>>
+OUTPUT:
+- OH2 Figure S1.png
+"""
 
 # Import libraries
 import os
-import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 from functions import *
+
+# Retrieve directory paths
+script_dir = os.path.dirname(os.path.abspath(__file__))
+data_dir = os.path.join(script_dir, '../data')
+figures_dir = os.path.join(script_dir, '../figures')
 
 # Plot parameters
 plt.rcParams.update({'font.size': 7})
@@ -39,7 +46,7 @@ def print_info(df, d18O_col, Dp17O_col, sample_name):
 
 
 # Read data from Table S1
-df = pd.read_csv(os.path.join(sys.path[0], "OH2 Table S2.csv"))
+df = pd.read_csv(os.path.join(data_dir, "OH2_Table_S2.csv"))
 df = df[df["measurementPeriod"].str.contains("2023-09-20 to 2023-10-08")]
 df = df[df["SampleName"].str.contains("light|heavy|NBS18|IAEA")]
 
@@ -99,6 +106,12 @@ print(df_gases_A.merge(df_gases_SD, on='SampleName').round({"Dp17O_CO2": 0, "d18
 # Create Figure S1
 fig, (ax1, ax2) = plt.subplots(1, 2)
 
+for ax in fig.get_axes():
+    i = fig.get_axes().index(ax)
+    ax.text(0.025, 0.975, chr(65 + i),
+            size=14, weight="bold", ha="left", va="top",
+            transform=ax.transAxes)
+
 # Create new dataframes for IAEA-603 and NBS-18
 df_IAEA603 = df[df["SampleName"].str.contains("IAEA603")]
 df_NBS18 = df[df["SampleName"].str.contains("NBS18")]
@@ -110,8 +123,6 @@ ax1.errorbar(df_IAEA603["d18O"], df_IAEA603["Dp17O"],
              yerr=df_IAEA603["Dp17OError"], xerr=df_IAEA603["d18OError"],
              fmt="none", color="#cacaca", zorder=0)
 
-ax1.text(0.98, 0.98, "A", size=14, ha="right", va="top",
-         transform=ax1.transAxes, fontweight="bold")
 ax1.set_title("IAEA-603")
 ax1.set_xlabel("$\delta^{18}$O (‰, unscaled)")
 ax1.set_ylabel("$\Delta\prime^{17}$O (ppm, unscaled)")
@@ -123,11 +134,9 @@ ax2.errorbar(df_NBS18["d18O"], df_NBS18["Dp17O"],
              yerr=df_NBS18["Dp17OError"], xerr=df_NBS18["d18OError"],
              fmt="none", color="#cacaca", zorder=0)
 
-ax2.text(0.98, 0.98, "B", size=14, ha="right", va="top",
-         transform=ax2.transAxes, fontweight="bold")
 ax2.set_title("NBS-18")
 ax2.set_xlabel("$\delta^{18}$O (‰, unscaled)")
 ax2.set_ylabel("$\Delta\prime^{17}$O (ppm, unscaled)")
 
-plt.savefig(os.path.join(sys.path[0], "OH2 Figure S1.png"))
+plt.savefig(os.path.join(figures_dir, "OH2_Figure_S1.png"))
 plt.close("all")

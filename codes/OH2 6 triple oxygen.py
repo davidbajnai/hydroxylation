@@ -1,17 +1,26 @@
-# This code creates Figures 3 and 4 of the manuscript
+"""
+This code creates Figures 3 and 4 of the manuscript
 
-# INPUT: OH2 Table S3.csv
-# OUTPUT: OH2 Figure 4.png, OH2 Graphical Abstract.png
+INPUT:
+- OH2 Table S3.csv
 
-# >>>>>>>>>
+OUTPUT:
+- OH2 Figure 4.png
+- OH2 Graphical Abstract.png
+"""
+
 
 # Import libraries
 import os
-import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from functions import *
+
+# Retrieve directory paths
+script_dir = os.path.dirname(os.path.abspath(__file__))
+data_dir = os.path.join(script_dir, '../data')
+figures_dir = os.path.join(script_dir, '../figures')
 
 # Plot parameters
 plt.rcParams.update({'font.size': 7})
@@ -25,7 +34,6 @@ plt.rcParams["savefig.dpi"] = 800
 plt.rcParams["savefig.bbox"] = "tight"
 plt.rcParams['savefig.transparent'] = False
 plt.rcParams['mathtext.default'] = 'regular'
-
 
 # Functions that make life easier
 
@@ -129,7 +137,7 @@ def calculate_OH(d18O_CO2, Dp17O_CO2, d18O_precipitate, Dp17O_precipitate):
 monte_carlo_iterations = 10**3
 
 # Read in TILDAS data
-df = pd.read_csv(os.path.join(sys.path[0], "OH2 Table S3.csv"))
+df = pd.read_csv(os.path.join(data_dir, "OH2_Table_S3.csv"))
 
 # Isotope composition of CO2 gas
 d18O_CO2 = df.loc[df['SampleName'] == 'KoelnRefCO2-2', 'd18O_CO2'].iloc[0]
@@ -317,7 +325,7 @@ ax.set_ylabel("$\Delta\prime^{17}$O (ppm)")
 ax.set_xlabel("$\delta\prime^{18}$O (‰, VSMOW)")
 
 # Save figure
-plt.savefig(os.path.join(sys.path[0], "OH2 Figure 4.png"))
+plt.savefig(os.path.join(figures_dir, "OH2_Figure_4.png"))
 plt.close("all")
 
 
@@ -402,5 +410,5 @@ ax.xaxis.set_ticks_position('none')
 ax.yaxis.set_ticks_position('none')
 
 # Save figure
-plt.savefig(os.path.join(sys.path[0], "OH2 Graphical Abstract.png"))
+plt.savefig(os.path.join(figures_dir, "OH2_Graphical_Abstract.png"))
 plt.close("all")

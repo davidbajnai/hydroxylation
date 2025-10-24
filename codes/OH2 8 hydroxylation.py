@@ -1,16 +1,20 @@
-# This code is used to calculate the hydroxylation thetas for two scenarios
+"""
+This code is used to calculate the hydroxylation thetas for two scenarios
 
-# OUTPUT: OH2 Figure 5.png
-
-# >>>>>>>>>
+OUTPUT:
+- OH2 Figure 5.png
+"""
 
 # Import libraries
 import os
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from functions import *
 
+# Retrieve directory paths
+script_dir = os.path.dirname(os.path.abspath(__file__))
+data_dir = os.path.join(script_dir, '../data')
+figures_dir = os.path.join(script_dir, '../figures')
 
 # Plotting parameters
 plt.rcParams.update({'font.size': 7})
@@ -84,6 +88,12 @@ def a17OH(T=273.15+22, eq="Z20-X3LYP", theta=0.5296):
 # Create Figure 5
 fig, (ax1, ax2) = plt.subplots(1, 2)
 
+for ax in fig.get_axes():
+    i = fig.get_axes().index(ax)
+    ax.text(0.025, 0.975, chr(65 + i),
+            size=14, weight="bold", ha="left", va="top",
+            transform=ax.transAxes)
+
 # Subpolot A: lakewater
 
 # Lakewater
@@ -118,8 +128,8 @@ d17O_OH_eq = B_from_a(a17OH(), d17O_water)
 Dp17O_OH_eq = Dp17O(d17O_OH_eq, d18O_OH_eq)
 
 # Effective OH-
-d18O_OH_eff = B_from_a(a18OH(eq = "BH21"), d18O_water)
-d17O_OH_eff = B_from_a(a17OH(eq = "BH21", theta = 0.523), d17O_water)
+d18O_OH_eff = B_from_a(a18OH(eq="BH21"), d18O_water)
+d17O_OH_eff = B_from_a(a17OH(eq="BH21", theta=0.523), d17O_water)
 Dp17O_OH_eff = Dp17O(d17O_OH_eff, d18O_OH_eff)
 
 # Line between effective OH- equilibrium OH-
@@ -189,9 +199,6 @@ ax1.text(prime(d18Occ_OHeff_KIE)+5, (Dp17Occ + Dp17Occ_OHeff_KIE)/2,
 ax1.annotate("", xy=(prime(d18Occ), Dp17Occ), xycoords='data',
             xytext=(prime(d18Occ_OHeff_KIE), Dp17Occ_OHeff_KIE), textcoords='data',
             arrowprops=dict(arrowstyle="<|-", color="#EC0016", lw=2), zorder=-1)
-
-plt.text(0.98, 0.98, "A", size=14, ha="right", va="top",
-         transform=ax1.transAxes, fontweight="bold")
 
 # Axis properties
 ax1.set_xlabel("$\delta\prime^{18}$O (‰, VSMOW)")
@@ -303,9 +310,6 @@ ax2.annotate("", xy=(prime(d18Occ), Dp17Occ), xycoords='data',
             xytext=(prime(d18Occ_OHeff_KIE), Dp17Occ_OHeff_KIE), textcoords='data',
             arrowprops=dict(arrowstyle="<|-", color="#EC0016", lw=2), zorder=-1)
 
-ax2.text(0.98, 0.98, "B", size=14, ha="right", va="top",
-         transform=ax2.transAxes, fontweight="bold")
-
 # Axis properties
 ax2.set_xlabel("$\delta\prime^{18}$O (‰, VSMOW)")
 ax2.set_ylabel("$\Delta\prime^{17}$O (ppm)")
@@ -313,5 +317,5 @@ ax2.set_xlim(-55, 85)
 ax2.set_ylim(-260, 260)
 
 # save the figure
-plt.savefig(os.path.join(sys.path[0], "OH2 Figure 5.png"))
+plt.savefig(os.path.join(figures_dir, "OH2_Figure_5.png"))
 plt.close("all")

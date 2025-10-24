@@ -1,8 +1,20 @@
-# The following code is used to scale the TILDAS data
-# based on the accepted values for the reference gases
+"""
+The following code is used to scale the TILDAS data
+based on the accepted values for the light and heavy CO2 reference gases.
 
-# INPUT: OH2 Table S2.csv
-# OUTPUT: OH2 Figure S2.png, OH2 Figure S3.png, OH2 Table S3.csv
+This script has been updated to include an option
+for scaling the measured sample isotope values
+using light and heavy CO2 reference gases
+measured relative to SMOW-SLAP (see Zahnow et al. 2025).
+
+INPUT:
+- OH2 Table S2.csv
+
+OUTPUT:
+- OH2 Figure S2.png
+- OH2 Figure S3.png
+- OH2 Table S3.csv
+"""
 
 # >>>>>>>>>
 
@@ -12,8 +24,13 @@ import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import subprocess
 from functions import *
 
+# Retrieve directory paths
+script_dir = os.path.dirname(os.path.abspath(__file__))
+data_dir = os.path.join(script_dir, '../data')
+figures_dir = os.path.join(script_dir, '../figures')
 
 # Plot parameters
 plt.rcParams.update({'font.size': 7})
@@ -49,8 +66,10 @@ def applyAFF(d18O_CO2, d17O_CO2, mineral):
     elif mineral == "aragonite":
         alpha = 1.01063
 
+    theta_AFF = 0.523 # Wostbrock et al. (2020) for calcite
+
     d18O_AC = (d18O_CO2 + 1000) / alpha - 1000
-    d17O_AC = (d17O_CO2 + 1000) / (alpha ** 0.523) - 1000
+    d17O_AC = (d17O_CO2 + 1000) / (alpha ** theta_AFF) - 1000
     Dp17O_AC = Dp17O(d17O_AC, d18O_AC)
 
     return d18O_AC, d17O_AC, Dp17O_AC
@@ -85,7 +104,7 @@ def scaleData(df, project):
         light_d18O_measured = group[group["SampleName"].str.contains("light")]["d18O"].mean()
         light_d17O_measured = group[group["SampleName"].str.contains("light")]["d17O"].mean()
 
-        # Accepted CO2 values - values calculated in OH2 scale reference.py
+        # Values calculated in OH2 scale reference.py
         heavy_d18O_accepted = 76.820
         heavy_Dp17O_accepted = -213
         heavy_d17O_accepted = unprime(heavy_Dp17O_accepted/1000 + 0.528 * prime(heavy_d18O_accepted))
@@ -93,6 +112,15 @@ def scaleData(df, project):
         light_d18O_accepted = -1.509
         light_Dp17O_accepted = -141
         light_d17O_accepted = unprime(light_Dp17O_accepted/1000 + 0.528 * prime(light_d18O_accepted))
+        
+        # Values reported by Zahnow et al. (2025)
+        # heavy_d18O_accepted = 80.424
+        # heavy_Dp17O_accepted = -87
+        # heavy_d17O_accepted = unprime(heavy_Dp17O_accepted/1000 + 0.528 * prime(heavy_d18O_accepted))
+
+        # light_d18O_accepted = -1.835
+        # light_Dp17O_accepted = -140
+        # light_d17O_accepted = unprime(light_Dp17O_accepted/1000 + 0.528 * prime(light_d18O_accepted))
 
         # Calculate the scaling factors
         slope_d18O = (light_d18O_accepted - heavy_d18O_accepted) / (light_d18O_measured - heavy_d18O_measured)
@@ -111,8 +139,7 @@ def scaleData(df, project):
         for standard in standards:
             if standard in group["SampleName"].values:
                 only_standard = group[group["SampleName"].str.contains(standard)].copy()
-                only_standard[["d18O_AC", "d17O_AC", "Dp17O_AC"]] = only_standard.apply(lambda x: applyAFF(x["d18O_scaled"], x["d17O_scaled"], "calcite"), axis=1, result_type="expand")
-                print_info(only_standard, "d18O_AC", "Dp17O_AC", standard); print("\t<--- scaled + AFF")
+                print_info(only_standard, "d18O_scaled", "Dp17O_scaled", standard); print("\t<--- scaled CO2")
    
         # Assign colors and markers to samples
         categories = group["SampleName"].unique()
@@ -142,11 +169,11 @@ def scaleData(df, project):
         plt.text(0.98, 0.98, SuppFig[FigNum], size=14, ha="right", va="top",
                  transform=ax.transAxes, fontweight="bold")
 
-        plt.savefig(os.path.join(sys.path[0], f"{project} Figure S2{SuppFig[FigNum]}.png"))
+        plt.savefig(os.path.join(figures_dir, f"{project}_Figure_S2{SuppFig[FigNum]}.png"))
         plt.close()
 
         # Exclude the standards from the exported dataframe
-        group = group[~group["SampleName"].str.contains("heavy|light|NBS|DH11|IAEA")]
+        group = group[~group["SampleName"].str.contains("heavy|light|NBS|IAEA|DH11")]
         df_samples = pd.concat([df_samples, group])
 
         FigNum += 1
@@ -174,7 +201,7 @@ def average_data(df):
 # Here we go!
 
 # Scale the data
-df = scaleData(pd.read_csv(os.path.join(sys.path[0], "OH2 Table S2.csv")), "OH2")
+df = scaleData(pd.read_csv(os.path.join(data_dir, "OH2_Table_S2.csv")), "OH2")
 
 # Average the data
 df_avg = average_data(df)
@@ -185,8 +212,8 @@ df_avg[["d18O_AC", "d17O_AC", "Dp17O_AC"]] = df_avg.apply(lambda x: applyAFF(x["
 # Print out and export the scaled data
 print("\nAll sample replicates averaged:")
 print(df_avg.round({"Dp17O_CO2": 0, "Dp17O_error": 0, "Dp17O_AC": 0}).round(3))
-df_avg.to_csv(os.path.join(sys.path[0], "OH2 Table S3.csv"), index=False)
-# df_avg.to_excel(os.path.join(sys.path[0], "OH2 Table S3.xlsx"), index=False)
+df_avg.to_csv(os.path.join(data_dir, "OH2_Table_S3.csv"), index=False)
+# df_avg.to_excel(os.path.join(data_dir, "OH2_Table_S3.xlsx"), index=False)
 
 # Exclude the KoelnRefCO2-2 from the dataset for additional figures
 df_avg = df_avg[~df_avg["SampleName"].str.contains("KoelnRefCO2-2")].reset_index(drop=True)
@@ -246,5 +273,7 @@ ax2.set_xlim(xlim)
 
 ax2.legend(loc='upper right', bbox_to_anchor=(1.25, 1))
 
-plt.savefig(os.path.join(sys.path[0], "OH2 Figure S3.png"))
+plt.savefig(os.path.join(figures_dir, "OH2_Figure_S3.png"))
 plt.close("all")
+
+subprocess.run([sys.executable, os.path.join(script_dir, "combineImage.py")])
