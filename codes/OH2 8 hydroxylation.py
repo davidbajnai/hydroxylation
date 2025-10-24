@@ -90,8 +90,8 @@ fig, (ax1, ax2) = plt.subplots(1, 2)
 
 for ax in fig.get_axes():
     i = fig.get_axes().index(ax)
-    ax.text(0.025, 0.975, chr(65 + i),
-            size=14, weight="bold", ha="left", va="top",
+    ax.text(0.975, 0.975, chr(65 + i),
+            size=14, weight="bold", ha="right", va="top",
             transform=ax.transAxes)
 
 # Subpolot A: lakewater
