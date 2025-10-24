@@ -17,19 +17,19 @@
 
 ## List of Supplementary Data
 >[!NOTE]
->- **[Table S2](data/OH2_Table_S2.png)**
+>- **[Table S2](data/OH2_Table_S2.csv)**
   Long-term replicate-level triple oxygen isotope data.  
   *Used in*: [Figure S1](figures/OH2_Figure_S1.png), [Figure S2](figures/OH2_Figure_S2.png), [Figure S3](figures/OH2_Figure_S3.png)
 >
->- **[Table S3](data/OH2_Table_S3.png)**
+>- **[Table S3](data/OH2_Table_S3.csv)**
   Scaled and averaged triple oxygen isotope data for the samples.  
   *Used in*: [Figure 3](figures/OH2_Figure_3.png), [Figure 4](figures/OH2_Figure_4.png)
 >
->- **[Table S4](data/OH2_Table_S4.png)**
+>- **[Table S4](data/OH2_Table_S4.csv)**
   Stable oxygen and carbon isotope data for the precipitates measured using mass spectrometry.
   *Used in*: [Figure 2](figures/OH2_Figure_2.png)
 >
->- **[BH21 York error](data/BH21_york_error.png)**
+>- **[BH21 York error](data/BH21_york_error.csv)**
   Uncertainty envelopes for the error considering linear regression in Bajnai & Herwartz (2021)
   *Used in*: [Figure 2](figures/OH2_Figure_2.png)
 
