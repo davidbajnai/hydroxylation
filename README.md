@@ -1,5 +1,5 @@
 # Supplementary material for:</br>Triple oxygen isotope systematics of CO<sub>2</sub> hydroxylation
-[![DOI](https://zenodo.org/badge/734303142.svg)](https://zenodo.org/doi/10.5281/zenodo.10830205)
+[![DOI](https://zenodo.org/badge/734303142.svg)](https://doi.org/10.5281/zenodo.10830205)
 
 ## Graphical abstract
 ![Graphical Abstract](figures/OH2_Graphical_Abstract.png)
