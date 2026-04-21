@@ -71,12 +71,14 @@ print(f"NBS-18: d18O = {NBS18_d18O_measured:.3f}‰, d17O = {NBS18_d17O_measured
 # Accepted CO2 values
 IAEA603_d18O_accepted = (to_VSMOW(-2.37) + 1000) * 1.01025 - 1000
 IAEA603_Dp17O_accepted = -147 # from Wostbrock et al. (2020)
+# IAEA603_Dp17O_accepted = -127.3 # from Chaillot et al. (2022) - considering no AFF correction
 IAEA603_d17O_accepted = unprime(IAEA603_Dp17O_accepted/1000 + 0.528 * prime(IAEA603_d18O_accepted))
 print("\nAccepted values:")
 print(f"IAEA-603: d18O = {IAEA603_d18O_accepted:.3f}‰, ∆'17O = {IAEA603_Dp17O_accepted:.0f} ppm")
 
 NBS18_d18O_accepted = (to_VSMOW(-23.2) + 1000) * 1.01025 - 1000
 NBS18_Dp17O_accepted = -100 # from Wostbrock et al. (2020)
+# NBS18_Dp17O_accepted = -101.3 # from Chaillot et al. (2022) - considering no AFF correction
 NBS18_d17O_accepted = unprime(NBS18_Dp17O_accepted/1000 + 0.528 * prime(NBS18_d18O_accepted))
 print(f"NBS-18: d18O = {NBS18_d18O_accepted:.3f}‰, ∆'17O = {NBS18_Dp17O_accepted:.0f} ppm")
 
